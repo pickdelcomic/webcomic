@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Webcomic</title>
+    <style>
+        body {
+            background: black;
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .comic {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .nav {
+            margin-top: 20px;
+        }
+
+        .nav a {
+            color: lime;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+        }
+
+        .nav a:hover {
+            text-decoration: underline;
+        }
+
+        .text-box {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>My Webcomic</h1>
+
+    <div class="container">
+        <img id="comicImage" class="comic" src="pages/1.png" alt="Comic Page">
+        <div class="text-box" id="comicText">Welcome to the beginning of your adventure.</div>
+    </div>
+
+    <div class="nav">
+        <a href="#" id="first">« First</a>
+        <a href="#" id="prev">‹ Prev</a>
+        <a href="#" id="next">Next ›</a>
+        <a href="#" id="latest">Latest »</a>
+    </div>
+
+    <script>
+        const pages = [
+            { img: 'IMG_2489.jpg', text: 'hi addy' },
+            { img: 'page/2.png', text: 'this is a test' },
+            { img: 'page/3.png', text: 'cool right still trying to add imgane' }
+        ];
+
+        let currentPage = 0;
+
+        const comicImage = document.getElementById('comicImage');
+        const comicText = document.getElementById('comicText');
+        const firstBtn = document.getElementById('first');
+        const prevBtn = document.getElementById('prev');
+        const nextBtn = document.getElementById('next');
+        const latestBtn = document.getElementById('latest');
+
+        function updateComic(page) {
+            comicImage.src = pages[page].img;
+            comicText.textContent = pages[page].text;
+        }
+
+        firstBtn.addEventListener('click', () => {
+            currentPage = 0;
+            updateComic(currentPage);
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 0) currentPage--;
+            updateComic(currentPage);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < pages.length - 1) currentPage++;
+            updateComic(currentPage);
+        });
+
+        latestBtn.addEventListener('click', () => {
+            currentPage = pages.length - 1;
+            updateComic(currentPage);
+        });
+
+        updateComic(currentPage);
+    </script>
+</body>
+
+</html>
