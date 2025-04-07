@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Webcomic</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: black;
+            color: limegreen;
+            font-family: monospace;
+        }
+        h1, p, a {
+            color: limegreen;
+        }
+        a {
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            color: white;
+        }
+        .comics-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .comic-thumbnail {
+            width: 200px;
+            border: 2px solid limegreen;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .comic-thumbnail:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>the comic shop</h1>
+    <p>Click a comic to start reading! 
+    all made by micah and addison</p>
+    
+     <audio id="menuMusic" autoplay loop>
+        <source src="audio/menu-music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+     </audio>
+        
+        <button onclick="toggleMusic()">🔊 Mute / Unmute</button>
+    </audio>
+
+    <div class="comics-container">
+        <a href="comic1.html">
+            <img src="thumbnails/comic1.png" alt="pomgrante an potato" class="comic-thumbnail">
+        </a>
+        <a href="comic2.html">
+            <img src="thumbnails/comic2.png" alt="WIP" class="comic-thumbnail">
+        </a>
+        <a href="comic3.html">
+            <img src="thumbnails/comic3.png" alt="WIP" class="comic-thumbnail">
+        </a>
+    </div>
+
+</body>
+</html>
