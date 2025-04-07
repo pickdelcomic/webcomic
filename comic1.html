@@ -1,103 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comic 1</title>
-    <style>
-        body {
-            text-align: center;
-            background-color: black;
-            color: limegreen;
-            font-family: monospace;
-        }
-        h1, p, a {
-            color: limegreen;
-        }
-        a {
-            text-decoration: none;
-            font-weight: bold;
-        }
-        a:hover {
-            color: white;
-        }
-        .comic {
-            max-width: 100%;
-            height: auto;
-            border: 2px solid limegreen;
-        }
-        .nav {
-            margin-top: 20px;
-        }
-        button {
-            background-color: black;
-            color: limegreen;
-            border: 2px solid limegreen;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: limegreen;
-            color: black;
-        }
-        #caption {
-            margin-top: 10px;
-            font-size: 18px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Comic 1</title>
+  <style>
+    body {
+      background-color: #C0C0C0;
+      font-family: Tahoma, Verdana, sans-serif;
+      color: black;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      background-color: #000080;
+      color: white;
+      padding: 10px;
+      margin: 0;
+      font-size: 22px;
+      border-bottom: 2px solid #808080;
+    }
+
+    p {
+      margin: 15px;
+      font-size: 16px;
+    }
+
+    .comic-container {
+      margin-top: 30px;
+    }
+
+    .comic-image {
+      width: 90%;
+      max-width: 700px;
+      background-color: #E0E0E0;
+      border: 2px solid black;
+      padding: 4px;
+      box-shadow: inset -1px -1px 0 #fff, inset 1px 1px 0 #404040;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      font-weight: bold;
+      color: #000080;
+      background-color: #E0E0E0;
+      border: 2px solid;
+      border-color: #FFFFFF #404040 #404040 #FFFFFF;
+      padding: 8px 16px;
+      box-shadow: inset -1px -1px 0 #fff, inset 1px 1px 0 #808080;
+    }
+
+    a:hover {
+      background-color: #C0D9F8;
+    }
+
+    #muteBtn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #E0E0E0;
+      color: black;
+      font-size: 14px;
+      padding: 5px 10px;
+      border: 2px solid;
+      border-color: #FFFFFF #404040 #404040 #FFFFFF;
+      box-shadow: inset -1px -1px 0 #fff, inset 1px 1px 0 #808080;
+      cursor: pointer;
+      z-index: 1000;
+      font-family: Tahoma, Verdana, sans-serif;
+    }
+
+    #muteBtn:active {
+      border-color: #404040 #FFFFFF #FFFFFF #404040;
+      box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+    }
+  </style>
 </head>
 <body>
 
-    <h1>Comic 1</h1>
-    <img id="comicImage" src="pages/comic1-1.png" alt="Comic 1 Page 1" class="comic">
-    <p id="caption">Welcome to the first page of Comic 1!</p>
+  <h1>Comic 1</h1>
 
-    <div class="nav">
-        <button id="prev">← Previous</button>
-        <button id="next">Next →</button>
-    </div>
+  <!-- 🔊 Mute/Unmute Button -->
+  <button id="muteBtn" onclick="toggleMusic()">🔊</button>
 
-    <div class="nav">
-        <a href="index.html">🏠 Back to Home</a>
-    </div>
+  <!-- 🎵 Background Music -->
+  <audio id="menuMusic" autoplay loop>
+    <source src="audio/menu-music.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
 
-    <script>
-        const pages = [
-            { image: "pages/comic1-1.png", text: "yippe!" },
-            { image: "pages/comic1-2.png", text: "soo cool right add!" },
-            { image: "pages/comic1-3.png", text: "pickdels soooo cool" }
-        ];
+  <div class="comic-container">
+    <img src="comics/comic1-page1.png" alt="Comic 1 Page 1" class="comic-image">
+    <p>Our story begins in a place most unexpected...</p>
+  </div>
 
-        let currentPage = 0;
-        const comicImage = document.getElementById("comicImage");
-        const caption = document.getElementById("caption");
-        const prevButton = document.getElementById("prev");
-        const nextButton = document.getElementById("next");
+  <!-- 📦 Navigation -->
+  <a href="index.html">Back to Main Menu</a>
 
-        function updatePage() {
-            comicImage.src = pages[currentPage].image;
-            caption.textContent = pages[currentPage].text;
-            prevButton.style.display = currentPage === 0 ? "none" : "inline";
-            nextButton.style.display = currentPage === pages.length - 1 ? "none" : "inline";
-        }
+  <script>
+    const music = document.getElementById("menuMusic");
+    const muteBtn = document.getElementById("muteBtn");
 
-        nextButton.addEventListener("click", () => {
-            if (currentPage < pages.length - 1) {
-                currentPage++;
-                updatePage();
-            }
-        });
+    music.volume = 0.3;
 
-        prevButton.addEventListener("click", () => {
-            if (currentPage > 0) {
-                currentPage--;
-                updatePage();
-            }
-        });
+    function toggleMusic() {
+      music.muted = !music.muted;
+      muteBtn.textContent = music.muted ? "🔇" : "🔊";
+    }
 
-        updatePage();
-    </script>
+    window.addEventListener("DOMContentLoaded", () => {
+      muteBtn.textContent = music.muted ? "🔇" : "🔊";
+    });
+  </script>
 
 </body>
 </html>
