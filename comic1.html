@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Comic 1: The Beginning</title>
+  <!-- Link to XP.css for Windows XP Styling -->
+  <link rel="stylesheet" href="https://unpkg.com/xp.css">
+  <style>
+    /* Additional Custom Styles */
+    body {
+      background-color: #0033cc;
+      color: white;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .comic-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .panel {
+      width: 80%;
+      max-width: 800px;
+      background-color: #f0f0f0;
+      border: 2px solid #2e4f8f;
+      margin: 10px 0;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: none; /* Initially hide all panels */
+    }
+    .panel img {
+      width: 100%;
+      height: auto;
+      border: 2px solid #2e4f8f;
+      margin-bottom: 10px;
+    }
+    .panel p {
+      color: #2e4f8f;
+      font-size: 14px;
+      text-align: left;
+    }
+    .navigation {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .nav-button {
+      background-color: transparent;
+      color: #2e4f8f;
+      padding: 10px 20px;
+      margin: 0 10px;
+      text-decoration: none;
+      border: 2px solid #2e4f8f;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .nav-button:hover {
+      background-color: #2e4f8f;
+      color: white;
+    }
+    .nav-button:disabled {
+      color: #888;
+      border-color: #888;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Comic Panels -->
+  <div class="comic-container" id="comicContainer">
+    <!-- Panels will be injected here by JavaScript -->
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="navigation">
+    <button class="nav-button" id="prevButton" onclick="navigate(-1)" disabled>Previous</button>
+    <button class="nav-button" id="nextButton" onclick="navigate(1)">Next</button>
+    <button class="nav-button" onclick="window.location.href='index.html'">Home</button>
+    <button class="nav-button" onclick="window.location.href='comic2.html'">Comic 2</button>
+  </div>
+
+  <script>
+    // Comic panel data
+    const comicPanels = [
+      { image: "pages/comic1-1.png", text: "Welcome to the first page of Comic 1!" },
+      { image: "pages/comic1-2.png", text: "Our hero begins their journey, unsure of what lies ahead." },
+      { image: "pages/comic1-3.png", text: "A challenge emerges, testing their resolve." },
+      // Add more panels here if needed
+    ];
+
+    // Function to load panels into the comic container
+    function loadComic() {
+      const container = document.getElementById('comicContainer');
+      comicPanels.forEach((panel, index) => {
+        const panelDiv = document.createElement('div');
+        panelDiv.classList.add('panel');
+        if (index === 0) panelDiv.style.display = 'block'; // Display the first panel
+
+        const img = document.createElement('img');
+        img.src = panel.image;
+        img.alt = 'Comic Image ' + (index + 1);
+
+        const text = document.createElement('p');
+        text.textContent = panel.text;
+
+        panelDiv.appendChild(img);
+        panelDiv.appendChild(text);
+        container.appendChild(panelDiv);
+      });
+    }
+
+    // Function to navigate through panels
+    let currentPanel = 0;
+    function navigate(direction) {
+      const panels = document.querySelectorAll('.panel');
+      panels[currentPanel].style.display = 'none'; // Hide current panel
+      currentPanel += direction;
+      panels[currentPanel].style.display = 'block'; // Show new panel
+
+      // Update button states
+      document.getElementById('prevButton').disabled = currentPanel === 0;
+      document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
+    }
+
+    // Initial load
+    loadComic();
+  </script>
+
+</body>
+</html>

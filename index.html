@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Webcomic Collection</title>
+  <!-- Link to XP.css for Windows XP Styling -->
+  <link rel="stylesheet" href="https://unpkg.com/xp.css">
+  <style>
+    /* Additional Custom Styles */
+    body {
+      background-color: #0033cc;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #2e4f8f;
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      color: white;
+      font-size: 24px;
+    }
+    .main-content {
+      display: flex;
+      margin-top: 20px;
+    }
+    .info {
+      width: 35%;
+      background-color: #f0f0f0;
+      padding: 15px;
+      border: 2px solid #2e4f8f;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .comics-list {
+      width: 60%;
+      margin-left: 20px;
+      overflow-y: auto;
+    }
+    .comic-window {
+      margin: 10px 0;
+      display: flex;
+      background-color: white;
+      padding: 10px;
+      border: 2px solid #2e4f8f;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .comic-window img {
+      width: 200px;
+      height: auto;
+      border: 2px solid #2e4f8f;
+      margin-right: 10px;
+    }
+    .comic-caption {
+      color: #2e4f8f;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .info h2 {
+      color: #2e4f8f;
+      font-size: 20px;
+    }
+    .info p {
+      color: #2e4f8f;
+      font-size: 14px;
+      text-align: center;
+    }
+    .info img {
+      width: 80%;
+      max-width: 300px;
+      height: auto;
+      border: 2px solid #2e4f8f;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>My Webcomic Collection</h1>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Left Side: Info Section -->
+    <div class="info">
+      <h2>About the Comic</h2>
+      <p>Welcome to my webcomic collection! Here, you’ll find a series of comics that explore different adventures and stories. Click on any comic to begin reading!</p>
+      <img src="your-image-here.jpg" alt="Comic Image">
+      <p>Created with love by [Your Name].</p>
+    </div>
+
+    <!-- Right Side: Comics List -->
+    <div class="comics-list" id="comicList"></div>
+  </div>
+
+  <script>
+    const comics = [
+      { image: "thumbnails/comic1.jpg", text: "Comic 1: The Beginning!", link: "comic1.html" },
+      { image: "thumbnails/comic2.png", text: "Comic 2: Trouble Brews...", link: "comic2.html" },
+      { image: "thumbnails/comic3.png", text: "Comic 3: Everything Explodes!", link: "comic3.html" }
+    ];
+
+    const comicList = document.getElementById("comicList");
+
+    comics.forEach(comic => {
+      const comicWindow = document.createElement("div");
+      comicWindow.classList.add("comic-window");
+
+      const link = document.createElement("a");
+      link.href = comic.link;
+      
+      const img = document.createElement("img");
+      img.src = comic.image;
+      img.alt = comic.text;
+
+      const caption = document.createElement("p");
+      caption.classList.add("comic-caption");
+      caption.textContent = comic.text;
+
+      link.appendChild(img);
+      comicWindow.appendChild(link);
+      comicWindow.appendChild(caption);
+
+      comicList.appendChild(comicWindow);
+    });
+  </script>
+
+</body>
+</html>
