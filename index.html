@@ -75,16 +75,13 @@
   <h1>picks comics</h1>
   <p>HELLO WORLD. this website is for post me micah and my freind addison to post comics.</p>
 
-  <!-- 🔊 Mute/Unmute Button -->
   <button id="muteBtn" onclick="toggleMusic()">🔊</button>
 
-  <!-- 🎵 Background Music -->
  <audio id="backgroundMusic" loop autoplay>
     <source src="music/coolmusic.m4a" type="audio/m4a">
     Your browser does not support the audio element.
   </audio>
 
-  <!-- 📚 Comic Thumbnails -->
   <div class="comics-container">
     <a href="comic1.html">
       <img src="thumbnails/thumbnail1.png" alt="Comic 1" class="comic-thumbnail">
@@ -97,12 +94,10 @@
     </a>
   </div>
 
-  <!-- 🧠 Script -->
   <script>
     const music = document.getElementById("menuMusic");
     const muteBtn = document.getElementById("muteBtn");
 
-    // Set initial volume
     music.volume = 0.3;
 
     function toggleMusic() {
