@@ -84,10 +84,37 @@
 <body>
 
   <!-- Background music -->
-<audio autoplay loop style="display: none;">
+<audio id="backgroundMusic" autoplay loop style="display: none;">
   <source src="audio/your-music-file.mp3" type="audio/mp3">
   Your browser does not support the audio element.
-</audio
+</audio>
+
+<script>
+  // Create a "click anywhere to play" prompt
+  window.onload = () => {
+    const music = document.getElementById('backgroundMusic');
+    const clickPrompt = document.createElement('div');
+    clickPrompt.innerText = "WELCOME :3";
+    clickPrompt.style.position = 'fixed';
+    clickPrompt.style.top = '50%';
+    clickPrompt.style.left = '50%';
+    clickPrompt.style.transform = 'translate(-50%, -50%)';
+    clickPrompt.style.backgroundColor = '#2e4f8f';
+    clickPrompt.style.color = 'white';
+    clickPrompt.style.padding = '10px';
+    clickPrompt.style.borderRadius = '5px';
+    clickPrompt.style.zIndex = '9999';
+    document.body.appendChild(clickPrompt);
+
+    // Play the music when the user clicks anywhere
+    document.body.addEventListener('click', function startMusic() {
+      music.play();
+      document.body.removeEventListener('click', startMusic);
+      clickPrompt.style.display = 'none';  // Hide the prompt after clicking
+    });
+  };
+</script>
+  
   <!-- Header -->
   <header>
     <h1>My Webcomic Collection</h1>
