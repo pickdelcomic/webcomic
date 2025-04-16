@@ -106,8 +106,8 @@
         img.alt = 'Comic Image ' + (index + 1);
 
         const text = document.createElement('p');
-        text.textContent = panel.text;
-
+text.innerHTML = panel.text;
+        
         panelDiv.appendChild(img);
         panelDiv.appendChild(text);
         container.appendChild(panelDiv);
