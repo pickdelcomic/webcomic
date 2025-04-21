@@ -3,34 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <title>picks and addy COMICS!!!!!@</title>
+
   <!-- XP.css for Windows XP look -->
   <link rel="stylesheet" href="https://unpkg.com/xp.css">
+
+  <!-- Skinny Pixel Font -->
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
   <style>
     body {
       background-color: #0033cc;
       color: white;
       margin: 0;
       padding: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'VT323', monospace;
     }
-    /* Title bar */
+
     header {
       background-color: #2e4f8f;
       padding: 20px;
       text-align: center;
     }
+
     header h1 {
       margin: 0;
       color: white;
       font-size: 24px;
     }
-    /* Button container directly under title bar, left-aligned */
+
     .button-container {
       text-align: left;
       margin: 10px 0;
       padding-left: 20px;
     }
-    /* Smaller button */
+
     .button-container button {
       background-color: white;
       color: #0033cc;
@@ -42,16 +48,18 @@
       border-radius: 8px;
       transition: transform 0.2s, background-color 0.2s, color 0.2s;
     }
+
     .button-container button:hover {
       background-color: #2e4f8f;
       color: white;
       transform: scale(1.05);
     }
-    /* Main content */
+
     .main-content {
       display: flex;
       margin-top: 20px;
     }
+
     .info {
       width: 35%;
       background-color: #f0f0f0;
@@ -62,11 +70,13 @@
       flex-direction: column;
       align-items: center;
     }
+
     .comics-list {
       width: 60%;
       margin-left: 20px;
       overflow-y: auto;
     }
+
     .comic-window {
       margin: 10px 0;
       display: flex;
@@ -76,26 +86,31 @@
       align-items: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+
     .comic-window img {
       width: 200px;
       height: auto;
       border: 2px solid #2e4f8f;
       margin-right: 10px;
     }
+
     .comic-caption {
       color: #2e4f8f;
       font-weight: bold;
       font-size: 14px;
     }
+
     .info h2 {
       color: #2e4f8f;
       font-size: 20px;
     }
+
     .info p {
       color: #2e4f8f;
       font-size: 14px;
       text-align: center;
     }
+
     .info img {
       width: 80%;
       max-width: 300px;
@@ -108,19 +123,15 @@
 </head>
 <body>
 
-  <!-- Title Bar -->
   <header>
     <h1>PICK AND ADDS COMICS</h1>
   </header>
 
-  <!-- Button Container under title bar, left-aligned -->
   <div class="button-container">
     <button onclick="window.location.href='characters.html'">Units stats</button>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
-    <!-- Info Section -->
     <div class="info">
       <h2>about the site</h2>
       <p>me pick and my best friend addy make comics and post em so hope you enjoy em. we also plan to do more with this site sooo check on us every often.</p>
@@ -128,11 +139,9 @@
       <p>have a blessed day <3</p>
     </div>
 
-    <!-- Comics List -->
     <div class="comics-list" id="comicList"></div>
   </div>
 
-  <!-- Inject comic thumbnails -->
   <script>
     const comics = [
       { image: "thumbnails/Cover1.png", text: "pomgrante and potota", link: "comic1.html" },
