@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Meet the Characters</title>
+  <link rel="stylesheet" href="https://unpkg.com/xp.css">
+  <style>
+    body {
+      background-color: #0033cc;
+      color: white;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      margin: 0;
+    }
+    .character-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+    .character {
+      cursor: pointer;
+      width: 100px;
+      height: 100px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid white;
+      transition: transform 0.2s ease;
+      background-color: #f0f0f0;
+    }
+    .character:hover {
+      transform: scale(1.1);
+    }
+    .character img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .character-info {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    .character-info img {
+      width: 300px;
+      border: 2px solid white;
+      margin-bottom: 15px;
+    }
+    .character-info p {
+      font-size: 16px;
+      color: #f0f0f0;
+    }
+    .nav-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: transparent;
+      border: 2px solid white;
+      color: white;
+      cursor: pointer;
+    }
+    .nav-button:hover {
+      background-color: white;
+      color: #0033cc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Click a Character!</h1>
+
+  <div id="grid" class="character-grid">
+    <div class="character" onclick="showCharacter('potota')">
+      <img src="faces/potota.png" alt="Potota">
+    </div>
+    <div class="character" onclick="showCharacter('pomgrante')">
+      <img src="faces/pomgrante.png" alt="Pomgrante">
+    </div>
+    <div class="character" onclick="showCharacter('drevil')">
+      <img src="faces/drevil.png" alt="Dr. Evil">
+    </div>
+    <!-- Add more characters here -->
+  </div>
+
+  <div id="info" class="character-info">
+    <img id="charImage" src="" alt="Character Full">
+    <p id="charText"></p>
+    <button class="nav-button" onclick="goBack()">Back to Characters</button>
+  </div>
+
+  <script>
+    const characterData = {
+      potota: {
+        img: "full/potota_full.png",
+        text: `
+          <strong>Name:</strong> Potota<br>
+          <strong>HP:</strong> 160<br>
+          <strong>DMG:</strong> 20<br>
+          <strong>Abilities:</strong><br>
+          Dumb Luck III<br>
+          Smarts II<br>
+          Kindness IIII (sometimes...)
+        `
+      },
+      pomgrante: {
+        img: "full/pomgrante_full.png",
+        text: `
+          <strong>Name:</strong> Pomgrante<br>
+          <strong>HP:</strong> 100<br>
+          <strong>DMG:</strong> 80<br>
+          <strong>Abilities:</strong><br>
+          Radness III<br>
+          Gun IIIII I<br>
+          Street Smarts III<br>
+          Real Smarts 0
+        `
+      },
+      drevil: {
+        img: "full/drevil_full.png",
+        text: `
+          <strong>Name:</strong> Dr. Evil<br>
+          <strong>HP:</strong> 200<br>
+          <strong>DMG:</strong> 50<br>
+          <strong>Abilities:</strong><br>
+          Rock IIIII<br>
+          Smarts IIIII<br>
+          Evilness I<br>
+          Bullet Proof III
+        `
+      }
+    };
+
+    function showCharacter(name) {
+      const grid = document.getElementById('grid');
+      const info = document.getElementById('info');
+      const img = document.getElementById('charImage');
+      const text = document.getElementById('charText');
+
+      const data = characterData[name];
+      img.src = data.img;
+      text.innerHTML = data.text;
+
+      grid.style.display = 'none';
+      info.style.display = 'flex';
+    }
+
+    function goBack() {
+      document.getElementById('grid').style.display = 'flex';
+      document.getElementById('info').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>
