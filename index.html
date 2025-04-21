@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>picks and addy COMICS!!!!!@</title>
- 
+  <!-- XP.css for Windows XP look -->
   <link rel="stylesheet" href="https://unpkg.com/xp.css">
   <style>
-    /* Additional Custom Styles */
     body {
       background-color: #0033cc;
       color: white;
       margin: 0;
       padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
+    /* Title bar */
     header {
       background-color: #2e4f8f;
       padding: 20px;
@@ -23,6 +24,30 @@
       color: white;
       font-size: 24px;
     }
+    /* Button container directly under title bar, left-aligned */
+    .button-container {
+      text-align: left;
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    /* Smaller button */
+    .button-container button {
+      background-color: white;
+      color: #0033cc;
+      border: 2px solid #2e4f8f;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: transform 0.2s, background-color 0.2s, color 0.2s;
+    }
+    .button-container button:hover {
+      background-color: #2e4f8f;
+      color: white;
+      transform: scale(1.05);
+    }
+    /* Main content */
     .main-content {
       display: flex;
       margin-top: 20px;
@@ -32,7 +57,7 @@
       background-color: #f0f0f0;
       padding: 15px;
       border: 2px solid #2e4f8f;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -49,7 +74,7 @@
       padding: 10px;
       border: 2px solid #2e4f8f;
       align-items: center;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .comic-window img {
       width: 200px;
@@ -83,61 +108,31 @@
 </head>
 <body>
 
-  <!-- Background music -->
-<audio id="backgroundMusic" autoplay loop style="display: none;">
-  <source src="audio/your-music-file.mp3" type="audio/mp3">
-  Your browser does not support the audio element.
-</audio>
-
-<script>
-  // Create a "click anywhere to play" prompt
-  window.onload = () => {
-    const music = document.getElementById('backgroundMusic');
-    const clickPrompt = document.createElement('div');
-    clickPrompt.innerText = "WELCOME :3";
-    clickPrompt.style.position = 'fixed';
-    clickPrompt.style.top = '50%';
-    clickPrompt.style.left = '50%';
-    clickPrompt.style.transform = 'translate(-50%, -50%)';
-    clickPrompt.style.backgroundColor = '#2e4f8f';
-    clickPrompt.style.color = 'white';
-    clickPrompt.style.padding = '10px';
-    clickPrompt.style.borderRadius = '5px';
-    clickPrompt.style.zIndex = '9999';
-    document.body.appendChild(clickPrompt);
-
-    // Play the music when the user clicks anywhere
-    document.body.addEventListener('click', function startMusic() {
-      music.play();
-      document.body.removeEventListener('click', startMusic);
-      clickPrompt.style.display = 'none';  // Hide the prompt after clicking
-    });
-  };
-</script>
-  
-  <!-- Header -->
+  <!-- Title Bar -->
   <header>
     <h1>PICK AND ADDS COMICS</h1>
-     <a href="characters.html">
-      <button>Meet the Characters!</button>
-    </a>
   </header>
+
+  <!-- Button Container under title bar, left-aligned -->
+  <div class="button-container">
+    <button onclick="window.location.href='characters.html'">Meet the Characters!</button>
+  </div>
 
   <!-- Main Content -->
   <div class="main-content">
-    <!-- Left Side: Info Section -->
+    <!-- Info Section -->
     <div class="info">
       <h2>about the site</h2>
-      <p>me pick and my best friend addy make comics and post em so hope you enjoy em we
-        also plan to do more with this site sooo check on us every often</p>
+      <p>me pick and my best friend addy make comics and post em so hope you enjoy em. we also plan to do more with this site sooo check on us every often.</p>
       <img src="your-image-here.jpg" alt="Comic Image">
-      <p> have a blessed day <3 </p>
+      <p>have a blessed day <3</p>
     </div>
 
-    <!-- Right Side: Comics List -->
+    <!-- Comics List -->
     <div class="comics-list" id="comicList"></div>
   </div>
 
+  <!-- Inject comic thumbnails -->
   <script>
     const comics = [
       { image: "thumbnails/Cover1.png", text: "pomgrante and potota", link: "comic1.html" },
@@ -148,25 +143,24 @@
     const comicList = document.getElementById("comicList");
 
     comics.forEach(comic => {
-      const comicWindow = document.createElement("div");
-      comicWindow.classList.add("comic-window");
+      const cw = document.createElement("div");
+      cw.className = "comic-window";
 
-      const link = document.createElement("a");
-      link.href = comic.link;
-      
+      const a = document.createElement("a");
+      a.href = comic.link;
+
       const img = document.createElement("img");
       img.src = comic.image;
       img.alt = comic.text;
 
-      const caption = document.createElement("p");
-      caption.classList.add("comic-caption");
-      caption.textContent = comic.text;
+      const cap = document.createElement("p");
+      cap.className = "comic-caption";
+      cap.textContent = comic.text;
 
-      link.appendChild(img);
-      comicWindow.appendChild(link);
-      comicWindow.appendChild(caption);
-
-      comicList.appendChild(comicWindow);
+      a.appendChild(img);
+      cw.appendChild(a);
+      cw.appendChild(cap);
+      comicList.appendChild(cw);
     });
   </script>
 
