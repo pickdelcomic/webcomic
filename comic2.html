@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Comic 2: Oh No, A Rival!</title>
+  <title>Comic 2 - Battle!</title>
+  <!-- Link to XP.css for Windows XP Styling -->
   <link rel="stylesheet" href="https://unpkg.com/xp.css">
   <style>
+    /* Basic Styling */
     body {
       background-color: #0033cc;
       color: white;
@@ -26,7 +28,7 @@
       margin: 10px 0;
       padding: 15px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      display: none;
+      display: none; /* Initially hide all panels */
     }
     .panel img {
       width: 100%;
@@ -39,36 +41,75 @@
       font-size: 14px;
       text-align: left;
     }
-    .navigation {
-      margin-top: 20px;
-      text-align: center;
+
+    /* Battle Styles */
+    .battle-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
-    .nav-button {
-      background-color: transparent;
-      color: #2e4f8f;
+    .hp-bar {
+      width: 100%;
+      height: 25px;
+      background-color: #444;
+      margin-bottom: 10px;
+    }
+    .hp {
+      height: 100%;
+      background-color: green;
+      width: 100%;
+    }
+    .log {
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      margin-top: 15px;
+      min-height: 50px;
+    }
+    .buttons {
+      margin-top: 10px;
+    }
+    .button {
       padding: 10px 20px;
-      margin: 0 10px;
-      text-decoration: none;
-      border: 2px solid #2e4f8f;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    .nav-button:hover {
+      margin: 5px;
       background-color: #2e4f8f;
       color: white;
+      border: none;
+      cursor: pointer;
     }
-    .nav-button:disabled {
-      color: #888;
-      border-color: #888;
-      cursor: not-allowed;
+    .button:hover {
+      background-color: #1c3b5f;
+    }
+
+    .shaky {
+      display: inline-block;
+      animation: shake 0.15s infinite;
+    }
+    @keyframes shake {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      10% { transform: translate(-1px, -2px) rotate(-1deg); }
+      20% { transform: translate(-3px, 0px) rotate(1deg); }
+      30% { transform: translate(3px, 2px) rotate(0deg); }
+      40% { transform: translate(1px, -1px) rotate(1deg); }
+      50% { transform: translate(-1px, 2px) rotate(-1deg); }
+      60% { transform: translate(-3px, 1px) rotate(0deg); }
+      70% { transform: translate(3px, 1px) rotate(-1deg); }
+      80% { transform: translate(-1px, -1px) rotate(1deg); }
+      90% { transform: translate(1px, 2px) rotate(0deg); }
+      100% { transform: translate(1px, -2px) rotate(-1deg); }
     }
   </style>
 </head>
 <body>
 
-  <div class="comic-container" id="comicContainer"></div>
+  <!-- Comic Panels -->
+  <div class="comic-container" id="comicContainer">
+    <!-- Panels will be injected here by JavaScript -->
+  </div>
 
+  <!-- Navigation Buttons -->
   <div class="navigation">
     <button class="nav-button" id="prevButton" onclick="navigate(-1)" disabled>Previous</button>
     <button class="nav-button" id="nextButton" onclick="navigate(1)">Next</button>
@@ -77,81 +118,126 @@
   </div>
 
   <script>
+    // Comic panel data
     const comicPanels = [
-      { image: "comic2/pages/panel1.png", text: "Panel 1 text." },
-      { image: "comic2/pages/panel2.png", text: "Panel 2 text." },
-      { image: "comic2/pages/panel3.png", text: "Panel 3 text." },
-      { image: "comic2/pages/panel4.png", text: "Panel 4 text." },
-      { image: "comic2/pages/panel5.png", text: "Panel 5 text." },
-      { image: "comic2/pages/panel6.png", text: "Panel 6 text." },
-      { image: "comic2/pages/panel7.png", text: "Panel 7 text." },
-      { image: "comic2/pages/panel8.png", text: "Panel 8 text." },
-      { image: "comic2/pages/panel9.png", text: "Panel 9 text." },
-      { image: "comic2/pages/panel10.png", text: "Panel 10 text." },
-      { image: "comic2/pages/panel11.png", text: "Panel 11 text." },
-      { image: "comic2/pages/panel12.png", text: "Panel 12 text." },
-      // RPG Battle Panel (Panel 13)
-      { image: "", text: "<div id='rpg-battle'></div>" },
-      { image: "comic2/pages/panel14.png", text: "Panel 14 text." },
-      { image: "comic2/pages/panel15.png", text: "Panel 15 text." }
+      { image: "pages/png1.png", text: "..." },
+      { image: "pages/Png2.png", text: "..." },
+      { image: "pages/Png3.png", text: "..." },
+      { image: "pages/Png4.png", text: "..." },
+      { image: "pages/Png5.png", text: "..." },
+      { image: "pages/Png6.png", text: "..." },
+      { image: "pages/Png7.png", text: "..." },
+      { image: "pages/Png8.png", text: "..." },
+      { image: "pages/Png9.png", text: "..." },
+      { image: "pages/Png10.png", text: "..." },
+      { image: "pages/Png11.png", text: "..." },
+      { image: "pages/Png12.png", text: "..." },
+      
+      /* Panel 13: Battle Setup */
+      { 
+        image: "images/battle-background.png", 
+        text: `
+          <div class="battle-container">
+            <div class="hp-bar"><div class="hp" id="pomHp" style="width: 100%"></div></div>
+            <div class="hp-bar"><div class="hp" id="potHp" style="width: 100%"></div></div>
+            <div class="hp-bar"><div class="hp" id="fateHp" style="width: 100%"></div></div>
+            
+            <img src="images/pomgrante.png" alt="Pomgrante" id="pomImage">
+            <img src="images/potota.png" alt="Potota" id="potImage">
+            <img src="images/fateKeeper.png" alt="Fate Keeper" id="fateImage">
+            
+            <div class="log" id="log">Battle Begins!</div>
+            
+            <div class="buttons">
+              <button class="button" onclick="attack()">Attack</button>
+              <button class="button" onclick="defend()">Defend</button>
+              <button class="button" onclick="useItem()">Use Item</button>
+            </div>
+          </div>
+        `
+      },
+
+      { image: "pages/Png14.png", text: "..." },
+      { image: "pages/Png15.png", text: "..." },
+      { image: "pages/Png16.png", text: "..." }
     ];
 
+    // Function to load panels into the comic container
     function loadComic() {
       const container = document.getElementById('comicContainer');
       comicPanels.forEach((panel, index) => {
         const panelDiv = document.createElement('div');
         panelDiv.classList.add('panel');
-        if (index === 0) panelDiv.style.display = 'block';
+        if (index === 0) panelDiv.style.display = 'block'; // Display the first panel
 
-        if (index === 12) {
-          const battle = document.createElement('div');
-          battle.innerHTML = `
-            <style>
-              .battle-box {
-                background-color: black;
-                color: lime;
-                padding: 20px;
-                font-family: monospace;
-                border: 2px solid lime;
-              }
-            </style>
-            <div class='battle-box'>
-              A wild RIVAL appears!<br>
-              <button onclick='alert("You used TACKLE! It's kinda effective.")'>TACKLE</button>
-              <button onclick='alert("You used YELL! The rival is confused.")'>YELL</button>
-              <button onclick='alert("You used ITEM! You gave him a flower. He blushed.")'>ITEM</button>
-              <button onclick='alert("You ran away. Maybe next time.")'>RUN</button>
-            </div>`;
-          panelDiv.innerHTML = battle.innerHTML;
-        } else {
-          const img = document.createElement('img');
-          img.src = panel.image;
-          img.alt = 'Comic Image ' + (index + 1);
+        const img = document.createElement('img');
+        img.src = panel.image;
+        img.alt = 'Comic Image ' + (index + 1);
 
-          const text = document.createElement('p');
-          text.innerHTML = panel.text;
+        const text = document.createElement('p');
+        text.innerHTML = panel.text;
 
-          panelDiv.appendChild(img);
-          panelDiv.appendChild(text);
-        }
+        panelDiv.appendChild(img);
+        panelDiv.appendChild(text);
         container.appendChild(panelDiv);
       });
     }
 
+    // Function to navigate through panels
     let currentPanel = 0;
     function navigate(direction) {
       const panels = document.querySelectorAll('.panel');
-      panels[currentPanel].style.display = 'none';
+      panels[currentPanel].style.display = 'none'; // Hide current panel
       currentPanel += direction;
-      panels[currentPanel].style.display = 'block';
+      panels[currentPanel].style.display = 'block'; // Show new panel
 
+      // Update button states
       document.getElementById('prevButton').disabled = currentPanel === 0;
       document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
     }
 
+    // Battle functions (for Panel 13)
+    let pomHp = 100;
+    let potHp = 100;
+    let fateHp = 150;
+
+    function attack() {
+      const damage = Math.floor(Math.random() * 20) + 10;  // Random damage
+      fateHp -= damage;
+      updateBattleLog(`Pomgrante attacks Fate Keeper for ${damage} damage!`);
+      updateHpBars();
+      checkBattleStatus();
+    }
+
+    function defend() {
+      updateBattleLog("Pomgrante defends!");
+    }
+
+    function useItem() {
+      updateBattleLog("Pomgrante uses an item!");
+    }
+
+    function updateBattleLog(message) {
+      const log = document.getElementById('log');
+      log.innerHTML = message;
+    }
+
+    function updateHpBars() {
+      document.getElementById('pomHp').style.width = `${(pomHp / 100) * 100}%`;
+      document.getElementById('potHp').style.width = `${(potHp / 100) * 100}%`;
+      document.getElementById('fateHp').style.width = `${(fateHp / 150) * 100}%`;
+    }
+
+    function checkBattleStatus() {
+      if (fateHp <= 0) {
+        updateBattleLog("Fate Keeper has been defeated!");
+        setTimeout(() => navigate(1), 2000);  // Go to next panel after 2 seconds
+      }
+    }
+
+    // Initial load
     loadComic();
   </script>
 
 </body>
 </html>
-
