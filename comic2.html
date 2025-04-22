@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Comic 2: Oh No, A Rival!</title>
+  <link rel="stylesheet" href="https://unpkg.com/xp.css">
+  <style>
+    body {
+      background-color: #0033cc;
+      color: white;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .comic-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .panel {
+      width: 80%;
+      max-width: 800px;
+      background-color: #f0f0f0;
+      border: 2px solid #2e4f8f;
+      margin: 10px 0;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+    .panel img {
+      width: 100%;
+      height: auto;
+      border: 2px solid #2e4f8f;
+      margin-bottom: 10px;
+    }
+    .panel p {
+      color: #2e4f8f;
+      font-size: 14px;
+      text-align: left;
+    }
+    .navigation {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .nav-button {
+      background-color: transparent;
+      color: #2e4f8f;
+      padding: 10px 20px;
+      margin: 0 10px;
+      text-decoration: none;
+      border: 2px solid #2e4f8f;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .nav-button:hover {
+      background-color: #2e4f8f;
+      color: white;
+    }
+    .nav-button:disabled {
+      color: #888;
+      border-color: #888;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="comic-container" id="comicContainer"></div>
+
+  <div class="navigation">
+    <button class="nav-button" id="prevButton" onclick="navigate(-1)" disabled>Previous</button>
+    <button class="nav-button" id="nextButton" onclick="navigate(1)">Next</button>
+    <button class="nav-button" onclick="window.location.href='index.html'">Home</button>
+    <button class="nav-button" onclick="window.location.href='comic1.html'">Comic 1</button>
+  </div>
+
+  <script>
+    const comicPanels = [
+      { image: "comic2/pages/panel1.png", text: "Panel 1 text." },
+      { image: "comic2/pages/panel2.png", text: "Panel 2 text." },
+      { image: "comic2/pages/panel3.png", text: "Panel 3 text." },
+      { image: "comic2/pages/panel4.png", text: "Panel 4 text." },
+      { image: "comic2/pages/panel5.png", text: "Panel 5 text." },
+      { image: "comic2/pages/panel6.png", text: "Panel 6 text." },
+      { image: "comic2/pages/panel7.png", text: "Panel 7 text." },
+      { image: "comic2/pages/panel8.png", text: "Panel 8 text." },
+      { image: "comic2/pages/panel9.png", text: "Panel 9 text." },
+      { image: "comic2/pages/panel10.png", text: "Panel 10 text." },
+      { image: "comic2/pages/panel11.png", text: "Panel 11 text." },
+      { image: "comic2/pages/panel12.png", text: "Panel 12 text." },
+      // RPG Battle Panel (Panel 13)
+      { image: "", text: "<div id='rpg-battle'></div>" },
+      { image: "comic2/pages/panel14.png", text: "Panel 14 text." },
+      { image: "comic2/pages/panel15.png", text: "Panel 15 text." }
+    ];
+
+    function loadComic() {
+      const container = document.getElementById('comicContainer');
+      comicPanels.forEach((panel, index) => {
+        const panelDiv = document.createElement('div');
+        panelDiv.classList.add('panel');
+        if (index === 0) panelDiv.style.display = 'block';
+
+        if (index === 12) {
+          const battle = document.createElement('div');
+          battle.innerHTML = `
+            <style>
+              .battle-box {
+                background-color: black;
+                color: lime;
+                padding: 20px;
+                font-family: monospace;
+                border: 2px solid lime;
+              }
+            </style>
+            <div class='battle-box'>
+              A wild RIVAL appears!<br>
+              <button onclick='alert("You used TACKLE! It's kinda effective.")'>TACKLE</button>
+              <button onclick='alert("You used YELL! The rival is confused.")'>YELL</button>
+              <button onclick='alert("You used ITEM! You gave him a flower. He blushed.")'>ITEM</button>
+              <button onclick='alert("You ran away. Maybe next time.")'>RUN</button>
+            </div>`;
+          panelDiv.innerHTML = battle.innerHTML;
+        } else {
+          const img = document.createElement('img');
+          img.src = panel.image;
+          img.alt = 'Comic Image ' + (index + 1);
+
+          const text = document.createElement('p');
+          text.innerHTML = panel.text;
+
+          panelDiv.appendChild(img);
+          panelDiv.appendChild(text);
+        }
+        container.appendChild(panelDiv);
+      });
+    }
+
+    let currentPanel = 0;
+    function navigate(direction) {
+      const panels = document.querySelectorAll('.panel');
+      panels[currentPanel].style.display = 'none';
+      currentPanel += direction;
+      panels[currentPanel].style.display = 'block';
+
+      document.getElementById('prevButton').disabled = currentPanel === 0;
+      document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
+    }
+
+    loadComic();
+  </script>
+
+</body>
+</html>
