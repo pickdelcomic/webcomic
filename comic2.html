@@ -1,12 +1,11 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Comic 2 - Battle!</title>
-  <!-- Link to XP.css for Windows XP Styling -->
   <link rel="stylesheet" href="https://unpkg.com/xp.css">
   <style>
-    /* Basic Styling */
     body {
       background-color: #0033cc;
       color: white;
@@ -14,12 +13,14 @@
       padding: 0;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
+
     .comic-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-top: 20px;
     }
+
     .panel {
       width: 80%;
       max-width: 800px;
@@ -28,18 +29,48 @@
       margin: 10px 0;
       padding: 15px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      display: none; /* Initially hide all panels */
+      display: none;
     }
+
     .panel img {
       width: 100%;
       height: auto;
       border: 2px solid #2e4f8f;
       margin-bottom: 10px;
     }
+
     .panel p {
       color: #2e4f8f;
       font-size: 14px;
       text-align: left;
+    }
+
+    .navigation {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .nav-button {
+      background-color: transparent;
+      color: #2e4f8f;
+      padding: 10px 20px;
+      margin: 0 10px;
+      text-decoration: none;
+      border: 2px solid #2e4f8f;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .nav-button:hover {
+      background-color: #2e4f8f;
+      color: white;
+    }
+
+    .nav-button:disabled {
+      color: #888;
+      border-color: #888;
+      cursor: not-allowed;
     }
 
     /* Battle Styles */
@@ -47,58 +78,48 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
     }
-    .hp-bar {
+
+    .battle-hp {
+      display: flex;
+      justify-content: space-between;
       width: 100%;
-      height: 25px;
-      background-color: #444;
-      margin-bottom: 10px;
     }
-    .hp {
+
+    .hp-bar {
+      width: 100px;
+      height: 10px;
+      background-color: #888;
+      border: 1px solid #555;
+    }
+
+    .hp-fill {
       height: 100%;
       background-color: green;
-      width: 100%;
     }
+
     .log {
-      background-color: #333;
-      color: white;
-      padding: 10px;
-      width: 100%;
-      margin-top: 15px;
-      min-height: 50px;
+      color: #2e4f8f;
+      margin: 10px 0;
     }
+
     .buttons {
-      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
     }
-    .button {
-      padding: 10px 20px;
-      margin: 5px;
+
+    .action-button {
       background-color: #2e4f8f;
       color: white;
+      padding: 10px;
       border: none;
       cursor: pointer;
     }
-    .button:hover {
-      background-color: #1c3b5f;
-    }
 
-    .shaky {
-      display: inline-block;
-      animation: shake 0.15s infinite;
-    }
-    @keyframes shake {
-      0% { transform: translate(1px, 1px) rotate(0deg); }
-      10% { transform: translate(-1px, -2px) rotate(-1deg); }
-      20% { transform: translate(-3px, 0px) rotate(1deg); }
-      30% { transform: translate(3px, 2px) rotate(0deg); }
-      40% { transform: translate(1px, -1px) rotate(1deg); }
-      50% { transform: translate(-1px, 2px) rotate(-1deg); }
-      60% { transform: translate(-3px, 1px) rotate(0deg); }
-      70% { transform: translate(3px, 1px) rotate(-1deg); }
-      80% { transform: translate(-1px, -1px) rotate(1deg); }
-      90% { transform: translate(1px, 2px) rotate(0deg); }
-      100% { transform: translate(1px, -2px) rotate(-1deg); }
+    .action-button:disabled {
+      background-color: #888;
+      cursor: not-allowed;
     }
   </style>
 </head>
@@ -118,7 +139,6 @@
   </div>
 
   <script>
-    // Comic panel data
     const comicPanels = [
       { image: "pages/png1.png", text: "..." },
       { image: "pages/Png2.png", text: "..." },
@@ -132,37 +152,31 @@
       { image: "pages/Png10.png", text: "..." },
       { image: "pages/Png11.png", text: "..." },
       { image: "pages/Png12.png", text: "..." },
-      
-      /* Panel 13: Battle Setup */
-      { 
-        image: "images/battle-background.png", 
+      {
+        image: "pages/battle_bg.png", 
         text: `
           <div class="battle-container">
-            <div class="hp-bar"><div class="hp" id="pomHp" style="width: 100%"></div></div>
-            <div class="hp-bar"><div class="hp" id="potHp" style="width: 100%"></div></div>
-            <div class="hp-bar"><div class="hp" id="fateHp" style="width: 100%"></div></div>
-            
-            <img src="images/pomgrante.png" alt="Pomgrante" id="pomImage">
-            <img src="images/potota.png" alt="Potota" id="potImage">
-            <img src="images/fateKeeper.png" alt="Fate Keeper" id="fateImage">
-            
-            <div class="log" id="log">Battle Begins!</div>
-            
+            <div class="battle-hp">
+              <div>Pomgrante: <div class="hp-bar"><div class="hp-fill" id="pomgranteHp"></div></div></div>
+              <div>Potota: <div class="hp-bar"><div class="hp-fill" id="pototaHp"></div></div></div>
+              <div>Fate Keeper: <div class="hp-bar"><div class="hp-fill" id="fateKeeperHp"></div></div></div>
+            </div>
+            <div class="log" id="battleLog">Battle Start!</div>
             <div class="buttons">
-              <button class="button" onclick="attack()">Attack</button>
-              <button class="button" onclick="defend()">Defend</button>
-              <button class="button" onclick="useItem()">Use Item</button>
+              <button class="action-button" id="attackButton" onclick="attack()">Attack</button>
+              <button class="action-button" id="healButton" onclick="heal()">Heal</button>
             </div>
           </div>
         `
       },
-
-      { image: "pages/Png14.png", text: "..." },
-      { image: "pages/Png15.png", text: "..." },
-      { image: "pages/Png16.png", text: "..." }
+      { image: "pages/Png14.png", text: "Fate Keeper wins... Pomgrante and Potota are teleported away!" },
+      { image: "pages/Png15.png", text: "The adventure continues!" }
     ];
 
-    // Function to load panels into the comic container
+    let pomgranteHealth = 100;
+    let pototaHealth = 100;
+    let fateKeeperHealth = 150;
+
     function loadComic() {
       const container = document.getElementById('comicContainer');
       comicPanels.forEach((panel, index) => {
@@ -183,62 +197,79 @@
       });
     }
 
-    // Function to navigate through panels
     let currentPanel = 0;
     function navigate(direction) {
       const panels = document.querySelectorAll('.panel');
-      panels[currentPanel].style.display = 'none'; // Hide current panel
+      panels[currentPanel].style.display = 'none';
       currentPanel += direction;
-      panels[currentPanel].style.display = 'block'; // Show new panel
-
+      panels[currentPanel].style.display = 'block';
+      
       // Update button states
       document.getElementById('prevButton').disabled = currentPanel === 0;
       document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
-    }
-
-    // Battle functions (for Panel 13)
-    let pomHp = 100;
-    let potHp = 100;
-    let fateHp = 150;
-
-    function attack() {
-      const damage = Math.floor(Math.random() * 20) + 10;  // Random damage
-      fateHp -= damage;
-      updateBattleLog(`Pomgrante attacks Fate Keeper for ${damage} damage!`);
-      updateHpBars();
-      checkBattleStatus();
-    }
-
-    function defend() {
-      updateBattleLog("Pomgrante defends!");
-    }
-
-    function useItem() {
-      updateBattleLog("Pomgrante uses an item!");
-    }
-
-    function updateBattleLog(message) {
-      const log = document.getElementById('log');
-      log.innerHTML = message;
-    }
-
-    function updateHpBars() {
-      document.getElementById('pomHp').style.width = `${(pomHp / 100) * 100}%`;
-      document.getElementById('potHp').style.width = `${(potHp / 100) * 100}%`;
-      document.getElementById('fateHp').style.width = `${(fateHp / 150) * 100}%`;
-    }
-
-    function checkBattleStatus() {
-      if (fateHp <= 0) {
-        updateBattleLog("Fate Keeper has been defeated!");
-        setTimeout(() => navigate(1), 2000);  // Go to next panel after 2 seconds
+      
+      // Update battle panel visibility
+      if (currentPanel === 12) {
+        showBattlePanel();
       }
     }
 
-    // Initial load
+    function showBattlePanel() {
+      updateHp();
+      document.getElementById('attackButton').disabled = false;
+      document.getElementById('healButton').disabled = false;
+    }
+
+    function updateHp() {
+      document.getElementById('pomgranteHp').style.width = `${(pomgranteHealth / 100) * 100}%`;
+      document.getElementById('pototaHp').style.width = `${(pototaHealth / 100) * 100}%`;
+      document.getElementById('fateKeeperHp').style.width = `${(fateKeeperHealth / 150) * 100}%`;
+    }
+
+    function attack() {
+      const damageToFateKeeper = Math.floor(Math.random() * 20 + 10);
+      fateKeeperHealth -= damageToFateKeeper;
+      document.getElementById('battleLog').innerHTML = `Pomgrante and Potota attack Fate Keeper for ${damageToFateKeeper} damage!`;
+
+      if (fateKeeperHealth <= 0) {
+        document.getElementById('battleLog').innerHTML += "<br>Fate Keeper is defeated!";
+        setTimeout(() => navigate(1), 2000);
+      } else {
+        fateKeeperTurn();
+      }
+      updateHp();
+    }
+
+    function heal() {
+      const healAmount = Math.floor(Math.random() * 20 + 10);
+      pomgranteHealth += healAmount;
+      pototaHealth += healAmount;
+      document.getElementById('battleLog').innerHTML = `Pomgrante and Potota heal for ${healAmount} HP!`;
+      updateHp();
+      fateKeeperTurn();
+    }
+
+    function fateKeeperTurn() {
+      const damageToPomgrante = Math.floor(Math.random() * 20 + 15);
+      const damageToPotota = Math.floor(Math.random() * 20 + 15);
+
+      pomgranteHealth -= damageToPomgrante;
+      pototaHealth -= damageToPotota;
+
+      document.getElementById('battleLog').innerHTML += `<br>Fate Keeper attacks Pomgrante for ${damageToPomgrante} damage!`;
+      document.getElementById('battleLog').innerHTML += `<br>Fate Keeper attacks Potota for ${damageToPotota} damage!`;
+
+      if (pomgranteHealth <= 0 || pototaHealth <= 0) {
+        document.getElementById('battleLog').innerHTML += "<br>Fate Keeper wins! Pomgrante and Potota are teleported away!";
+        setTimeout(() => navigate(1), 2000);
+      }
+
+      updateHp();
+    }
+
     loadComic();
   </script>
 
 </body>
 </html>
-</html>
+
