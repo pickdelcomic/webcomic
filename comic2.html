@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -84,6 +83,7 @@
       display: flex;
       justify-content: space-between;
       width: 100%;
+      margin-bottom: 10px;
     }
 
     .hp-bar {
@@ -101,6 +101,7 @@
     .log {
       color: #2e4f8f;
       margin: 10px 0;
+      min-height: 2em;
     }
 
     .buttons {
@@ -126,9 +127,7 @@
 <body>
 
   <!-- Comic Panels -->
-  <div class="comic-container" id="comicContainer">
-    <!-- Panels will be injected here by JavaScript -->
-  </div>
+  <div class="comic-container" id="comicContainer"></div>
 
   <!-- Navigation Buttons -->
   <div class="navigation">
@@ -140,18 +139,18 @@
 
   <script>
     const comicPanels = [
-      { image: "pages/png1.png", text: "..." },
-      { image: "pages/Png2.png", text: "..." },
-      { image: "pages/Png3.png", text: "..." },
-      { image: "pages/Png4.png", text: "..." },
-      { image: "pages/Png5.png", text: "..." },
-      { image: "pages/Png6.png", text: "..." },
-      { image: "pages/Png7.png", text: "..." },
-      { image: "pages/Png8.png", text: "..." },
-      { image: "pages/Png9.png", text: "..." },
-      { image: "pages/Png10.png", text: "..." },
-      { image: "pages/Png11.png", text: "..." },
-      { image: "pages/Png12.png", text: "..." },
+      { image: "pages/png1.png", text: "Panel 1 text." },
+      { image: "pages/Png2.png", text: "Panel 2 text." },
+      { image: "pages/Png3.png", text: "Panel 3 text." },
+      { image: "pages/Png4.png", text: "Panel 4 text." },
+      { image: "pages/Png5.png", text: "Panel 5 text." },
+      { image: "pages/Png6.png", text: "Panel 6 text." },
+      { image: "pages/Png7.png", text: "Panel 7 text." },
+      { image: "pages/Png8.png", text: "Panel 8 text." },
+      { image: "pages/Png9.png", text: "Panel 9 text." },
+      { image: "pages/Png10.png", text: "Panel 10 text." },
+      { image: "pages/Png11.png", text: "Panel 11 text." },
+      { image: "pages/Png12.png", text: "Panel 12 text." },
       {
         image: "pages/battle_bg.png", 
         text: `
@@ -169,8 +168,8 @@
           </div>
         `
       },
-      { image: "pages/Png14.png", text: "Fate Keeper wins... Pomgrante and Potota are teleported away!" },
-      { image: "pages/Png15.png", text: "The adventure continues!" }
+      { image: "pages/Png14.png", text: "Panel 14 text." },
+      { image: "pages/Png15.png", text: "Panel 15 text." }
     ];
 
     let pomgranteHealth = 100;
@@ -182,7 +181,7 @@
       comicPanels.forEach((panel, index) => {
         const panelDiv = document.createElement('div');
         panelDiv.classList.add('panel');
-        if (index === 0) panelDiv.style.display = 'block'; // Display the first panel
+        if (index === 0) panelDiv.style.display = 'block';
 
         const img = document.createElement('img');
         img.src = panel.image;
@@ -203,21 +202,24 @@
       panels[currentPanel].style.display = 'none';
       currentPanel += direction;
       panels[currentPanel].style.display = 'block';
-      
-      // Update button states
+
+      // Update navigation buttons
       document.getElementById('prevButton').disabled = currentPanel === 0;
       document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
-      
-      // Update battle panel visibility
+
+      // If battle panel, initialize
       if (currentPanel === 12) {
-        showBattlePanel();
+        initBattle();
       }
     }
 
-    function showBattlePanel() {
-      updateHp();
+    function initBattle() {
+      // disable next until after loss
+      document.getElementById('nextButton').disabled = true;
       document.getElementById('attackButton').disabled = false;
       document.getElementById('healButton').disabled = false;
+      updateHp();
+      document.getElementById('battleLog').textContent = 'Battle Start!';
     }
 
     function updateHp() {
@@ -227,48 +229,47 @@
     }
 
     function attack() {
-      const damageToFateKeeper = Math.floor(Math.random() * 20 + 10);
-      fateKeeperHealth -= damageToFateKeeper;
-      document.getElementById('battleLog').innerHTML = `Pomgrante and Potota attack Fate Keeper for ${damageToFateKeeper} damage!`;
-
+      const dmg = Math.floor(Math.random() * 20 + 10);
+      fateKeeperHealth -= dmg;
+      document.getElementById('battleLog').innerHTML = `You attack Fate Keeper for ${dmg}!`;
+      updateHp();
       if (fateKeeperHealth <= 0) {
-        document.getElementById('battleLog').innerHTML += "<br>Fate Keeper is defeated!";
-        setTimeout(() => navigate(1), 2000);
+        endBattle();
       } else {
         fateKeeperTurn();
       }
-      updateHp();
     }
 
     function heal() {
-      const healAmount = Math.floor(Math.random() * 20 + 10);
-      pomgranteHealth += healAmount;
-      pototaHealth += healAmount;
-      document.getElementById('battleLog').innerHTML = `Pomgrante and Potota heal for ${healAmount} HP!`;
+      const healAmt = Math.floor(Math.random() * 20 + 10);
+      pomgranteHealth = Math.min(100, pomgranteHealth + healAmt);
+      pototaHealth = Math.min(100, pototaHealth + healAmt);
+      document.getElementById('battleLog').innerHTML = `You heal for ${healAmt}!`;
       updateHp();
       fateKeeperTurn();
     }
 
     function fateKeeperTurn() {
-      const damageToPomgrante = Math.floor(Math.random() * 20 + 15);
-      const damageToPotota = Math.floor(Math.random() * 20 + 15);
-
-      pomgranteHealth -= damageToPomgrante;
-      pototaHealth -= damageToPotota;
-
-      document.getElementById('battleLog').innerHTML += `<br>Fate Keeper attacks Pomgrante for ${damageToPomgrante} damage!`;
-      document.getElementById('battleLog').innerHTML += `<br>Fate Keeper attacks Potota for ${damageToPotota} damage!`;
-
-      if (pomgranteHealth <= 0 || pototaHealth <= 0) {
-        document.getElementById('battleLog').innerHTML += "<br>Fate Keeper wins! Pomgrante and Potota are teleported away!";
-        setTimeout(() => navigate(1), 2000);
-      }
-
+      const dmg1 = Math.floor(Math.random() * 20 + 15);
+      const dmg2 = Math.floor(Math.random() * 20 + 15);
+      pomgranteHealth -= dmg1;
+      pototaHealth -= dmg2;
+      document.getElementById('battleLog').innerHTML += `<br>Fate Keeper hits Pomgrante for ${dmg1}!`;
+      document.getElementById('battleLog').innerHTML += `<br>Fate Keeper hits Potota for ${dmg2}!`;
       updateHp();
+      if (pomgranteHealth <= 0 || pototaHealth <= 0) {
+        document.getElementById('battleLog').innerHTML += '<br>You have been defeated!';
+        document.getElementById('attackButton').disabled = true;
+        document.getElementById('healButton').disabled = true;
+        document.getElementById('nextButton').disabled = false;
+      }
     }
 
     loadComic();
   </script>
+
+</body>
+</html>
 
 </body>
 </html>
