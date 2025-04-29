@@ -2,275 +2,130 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Comic 2 - Battle!</title>
-  <link rel="stylesheet" href="https://unpkg.com/xp.css">
+  <title>Comic 2</title>
+  <!-- XP.css for retro Windows XP style and VT323 font -->
+  <link rel="stylesheet" href="https://unpkg.com/xp.css" />  <!-- Windows XP theme&#8203;:contentReference[oaicite:8]{index=8} -->
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
     body {
-      background-color: #0033cc;
-      color: white;
-      margin: 0;
-      padding: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'VT323', monospace;
+      background-color: #ADD8E6; /* XP-blue background */
     }
-
-    .comic-container {
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .hp-bar-container {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 20px;
-    }
-
-    .panel {
-      width: 80%;
-      max-width: 800px;
-      background-color: #f0f0f0;
-      border: 2px solid #2e4f8f;
-      margin: 10px 0;
-      padding: 15px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      display: none;
-    }
-
-    .panel img {
-      width: 100%;
-      height: auto;
-      border: 2px solid #2e4f8f;
+      justify-content: space-around;
       margin-bottom: 10px;
-    }
-
-    .panel p {
-      color: #2e4f8f;
-      font-size: 14px;
-      text-align: left;
-    }
-
-    .navigation {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    .nav-button {
-      background-color: transparent;
-      color: #2e4f8f;
-      padding: 10px 20px;
-      margin: 0 10px;
-      text-decoration: none;
-      border: 2px solid #2e4f8f;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .nav-button:hover {
-      background-color: #2e4f8f;
-      color: white;
-    }
-
-    .nav-button:disabled {
-      color: #888;
-      border-color: #888;
-      cursor: not-allowed;
-    }
-
-    /* Battle Styles */
-    .battle-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .battle-hp {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-
-    .hp-bar {
-      width: 100px;
-      height: 10px;
-      background-color: #888;
-      border: 1px solid #555;
-    }
-
-    .hp-fill {
-      height: 100%;
-      background-color: green;
-    }
-
-    .log {
-      color: #2e4f8f;
-      margin: 10px 0;
-      min-height: 2em;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-
-    .action-button {
-      background-color: #2e4f8f;
-      color: white;
-      padding: 10px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .action-button:disabled {
-      background-color: #888;
-      cursor: not-allowed;
     }
   </style>
 </head>
 <body>
+  <div class="window" style="width: 600px; margin: 20px auto;">
+    <div class="title-bar">
+      <div class="title-bar-text">Comic 2: The Fate Battle</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <!-- Panels 1–12 -->
+      <div id="panel1" class="panel active"><p>Pomgrante and Potota begin their journey.</p></div>
+      <div id="panel2" class="panel"><p>Panel 2 content here.</p></div>
+      <!-- ... panels 3 through 11 ... -->
+      <div id="panel12" class="panel"><p>After many challenges, they finally confront the Fate Keeper.</p></div>
 
-  <!-- Comic Panels -->
-  <div class="comic-container" id="comicContainer"></div>
+      <!-- Panel 13: Battle -->
+      <div id="panel13" class="panel">
+        <div class="hp-bar-container">
+          <div>Pomgrante: <progress id="hpPom" max="100" value="100"></progress></div>
+          <div>Potota: <progress id="hpPot" max="100" value="100"></progress></div>
+          <div>Fate Keeper: <progress id="hpFK" max="100" value="100"></progress></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+          <div>
+            <img src="sprites/pomgrante.png" alt="Pomgrante">
+            <img src="sprites/potota.png" alt="Potota">
+          </div>
+          <div>
+            <img src="sprites/fatekeeper.png" alt="Fate Keeper">
+          </div>
+        </div>
+        <p id="battle-msg">A wild Fate Keeper appears!</p>
+        <div style="margin-top: 10px;">
+          <button id="fightBtn">Fight</button>
+          <button id="itemBtn">Item (Hug)</button>
+        </div>
+      </div>
 
-  <!-- Navigation Buttons -->
-  <div class="navigation">
-    <button class="nav-button" id="prevButton" onclick="navigate(-1)" disabled>Previous</button>
-    <button class="nav-button" id="nextButton" onclick="navigate(1)">Next</button>
-    <button class="nav-button" onclick="window.location.href='index.html'">Home</button>
-    <button class="nav-button" onclick="window.location.href='comic1.html'">Comic 1</button>
+      <!-- Panels 14–15 -->
+      <div id="panel14" class="panel"><p>Having been teleported, Pomgrante and Potota find themselves in an unknown realm.</p></div>
+      <div id="panel15" class="panel"><p>Their adventure continues...</p></div>
+
+      <!-- Navigation Buttons -->
+      <div style="margin-top: 10px;">
+        <button id="prevBtn">Previous</button>
+        <button id="nextBtn">Next</button>
+      </div>
+    </div>
   </div>
 
+  <!-- JavaScript for panel navigation and battle logic -->
   <script>
-    const comicPanels = [
-      { image: "pages/png1.png", text: "Panel 1 text." },
-      { image: "pages/Png2.png", text: "Panel 2 text." },
-      { image: "pages/Png3.png", text: "Panel 3 text." },
-      { image: "pages/Png4.png", text: "Panel 4 text." },
-      { image: "pages/Png5.png", text: "Panel 5 text." },
-      { image: "pages/Png6.png", text: "Panel 6 text." },
-      { image: "pages/Png7.png", text: "Panel 7 text." },
-      { image: "pages/Png8.png", text: "Panel 8 text." },
-      { image: "pages/Png9.png", text: "Panel 9 text." },
-      { image: "pages/Png10.png", text: "Panel 10 text." },
-      { image: "pages/Png11.png", text: "Panel 11 text." },
-      { image: "pages/Png12.png", text: "Panel 12 text." },
-      {
-        image: "pages/battle_bg.png", 
-        text: `
-          <div class="battle-container">
-            <div class="battle-hp">
-              <div>Pomgrante: <div class="hp-bar"><div class="hp-fill" id="pomgranteHp"></div></div></div>
-              <div>Potota: <div class="hp-bar"><div class="hp-fill" id="pototaHp"></div></div></div>
-              <div>Fate Keeper: <div class="hp-bar"><div class="hp-fill" id="fateKeeperHp"></div></div></div>
-            </div>
-            <div class="log" id="battleLog">Battle Start!</div>
-            <div class="buttons">
-              <button class="action-button" id="attackButton" onclick="attack()">Attack</button>
-              <button class="action-button" id="healButton" onclick="heal()">Heal</button>
-            </div>
-          </div>
-        `
-      },
-      { image: "pages/Png14.png", text: "Panel 14 text." },
-      { image: "pages/Png15.png", text: "Panel 15 text." }
-    ];
-
-    let pomgranteHealth = 100;
-    let pototaHealth = 100;
-    let fateKeeperHealth = 150;
-
-    function loadComic() {
-      const container = document.getElementById('comicContainer');
-      comicPanels.forEach((panel, index) => {
-        const panelDiv = document.createElement('div');
-        panelDiv.classList.add('panel');
-        if (index === 0) panelDiv.style.display = 'block';
-
-        const img = document.createElement('img');
-        img.src = panel.image;
-        img.alt = 'Comic Image ' + (index + 1);
-
-        const text = document.createElement('p');
-        text.innerHTML = panel.text;
-
-        panelDiv.appendChild(img);
-        panelDiv.appendChild(text);
-        container.appendChild(panelDiv);
-      });
-    }
-
-    let currentPanel = 0;
-    function navigate(direction) {
-      const panels = document.querySelectorAll('.panel');
-      panels[currentPanel].style.display = 'none';
-      currentPanel += direction;
-      panels[currentPanel].style.display = 'block';
-
-      // Update navigation buttons
-      document.getElementById('prevButton').disabled = currentPanel === 0;
-      document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
-
-      // If battle panel, initialize
-      if (currentPanel === 12) {
-        initBattle();
-      }
-    }
-
-    function initBattle() {
-      // disable next until after loss
-      document.getElementById('nextButton').disabled = true;
-      document.getElementById('attackButton').disabled = false;
-      document.getElementById('healButton').disabled = false;
-      updateHp();
-      document.getElementById('battleLog').textContent = 'Battle Start!';
-    }
-
-    function updateHp() {
-      document.getElementById('pomgranteHp').style.width = `${(pomgranteHealth / 100) * 100}%`;
-      document.getElementById('pototaHp').style.width = `${(pototaHealth / 100) * 100}%`;
-      document.getElementById('fateKeeperHp').style.width = `${(fateKeeperHealth / 150) * 100}%`;
-    }
-
-    function attack() {
-      const dmg = Math.floor(Math.random() * 20 + 10);
-      fateKeeperHealth -= dmg;
-      document.getElementById('battleLog').innerHTML = `You attack Fate Keeper for ${dmg}!`;
-      updateHp();
-      if (fateKeeperHealth <= 0) {
-        endBattle();
+    let currentPanel = 1, totalPanels = 15;
+    function showPanel(n) {
+      document.getElementById("panel" + currentPanel).classList.remove("active");
+      currentPanel = n;
+      document.getElementById("panel" + currentPanel).classList.add("active");
+      document.getElementById("prevBtn").disabled = (currentPanel === 1);
+      if (currentPanel === 13) {
+        document.getElementById("nextBtn").disabled = true;
       } else {
-        fateKeeperTurn();
+        document.getElementById("nextBtn").disabled = (currentPanel === totalPanels);
       }
     }
+    // Panel navigation events
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      if (currentPanel > 1) showPanel(currentPanel - 1);
+    });
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      if (currentPanel < totalPanels) showPanel(currentPanel + 1);
+    });
+    showPanel(1);  // initialize display
 
-    function heal() {
-      const healAmt = Math.floor(Math.random() * 20 + 10);
-      pomgranteHealth = Math.min(100, pomgranteHealth + healAmt);
-      pototaHealth = Math.min(100, pototaHealth + healAmt);
-      document.getElementById('battleLog').innerHTML = `You heal for ${healAmt}!`;
-      updateHp();
-      fateKeeperTurn();
+    // Battle logic variables
+    let hpPom = 100, hpPot = 100, hpFK = 100;
+    function fight() {
+      if (hpPom <= 0 && hpPot <= 0) return;
+      hpFK = Math.max(0, hpFK - 10);
+      document.getElementById("hpFK").value = hpFK;
+      document.getElementById("battle-msg").textContent = "You attack the Fate Keeper!";
+      setTimeout(enemyAttack, 500);
     }
-
-    function fateKeeperTurn() {
-      const dmg1 = Math.floor(Math.random() * 20 + 15);
-      const dmg2 = Math.floor(Math.random() * 20 + 15);
-      pomgranteHealth -= dmg1;
-      pototaHealth -= dmg2;
-      document.getElementById('battleLog').innerHTML += `<br>Fate Keeper hits Pomgrante for ${dmg1}!`;
-      document.getElementById('battleLog').innerHTML += `<br>Fate Keeper hits Potota for ${dmg2}!`;
-      updateHp();
-      if (pomgranteHealth <= 0 || pototaHealth <= 0) {
-        document.getElementById('battleLog').innerHTML += '<br>You have been defeated!';
-        document.getElementById('attackButton').disabled = true;
-        document.getElementById('healButton').disabled = true;
-        document.getElementById('nextButton').disabled = false;
+    function hug() {
+      if (hpPom <= 0 && hpPot <= 0) return;
+      document.getElementById("battle-msg").textContent = "You hug for courage!";
+      setTimeout(enemyAttack, 500);
+    }
+    function enemyAttack() {
+      let dmg = Math.floor(Math.random() * 10) + 5;
+      if (hpPom > 0) { hpPom = Math.max(0, hpPom - dmg); document.getElementById("hpPom").value = hpPom; }
+      if (hpPot > 0) { hpPot = Math.max(0, hpPot - dmg); document.getElementById("hpPot").value = hpPot; }
+      if (hpPom <= 0 && hpPot <= 0) {
+        document.getElementById("battle-msg").textContent = "The Fate Keeper teleports you away!";
+        document.getElementById("fightBtn").disabled = true;
+        document.getElementById("itemBtn").disabled = true;
+        document.getElementById("nextBtn").disabled = false;  // unlock Next&#8203;:contentReference[oaicite:9]{index=9}
       }
     }
-
-    loadComic();
+    // Attach battle button events
+    document.getElementById("fightBtn").addEventListener("click", fight);
+    document.getElementById("itemBtn").addEventListener("click", hug);
   </script>
-
 </body>
 </html>
-
 </body>
 </html>
 
