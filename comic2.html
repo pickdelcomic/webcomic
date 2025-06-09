@@ -2,132 +2,526 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Deltarune-Style Battle v2</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+<title>Deltarune-style Battle</title>
 <style>
   body {
-    background: #000;
-    color: #fff;
-    font-family: 'Press Start 2P', monospace;
-    margin: 0;
-    padding: 0;
+    background: #222;
+    color: white;
+    font-family: 'Press Start 2P', cursive, monospace;
+    user-select: none;
+    margin: 0; padding: 0;
   }
   #battle-container {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 12px;
-    border: 4px solid white;
+    width: 640px;
+    margin: 20px auto;
     background: #111;
-    box-shadow: 0 0 0 4px #6600cc;
+    border: 4px solid #444;
+    padding: 15px;
+    box-sizing: border-box;
   }
-  #battle-area {
-    height: 200px;
-    background: #222;
-    border: 2px solid white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 12px;
+  .status-bar {
+    margin-bottom: 10px;
   }
-  #enemy-sprite {
-    width: 96px;
-    height: 96px;
-    background: url('https://i.imgur.com/jGXmnYI.png') no-repeat center center;
-    background-size: contain;
-    image-rendering: pixelated;
+  .character {
+    margin-bottom: 15px;
   }
-  #party-menu {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-  .party-member {
-    width: 30%;
-    border: 3px solid white;
-    padding: 8px;
-    background: black;
-    opacity: 0.4;
-  }
-  .party-member.current {
-    opacity: 1;
-  }
-  .party-member img {
-    width: 64px;
-    height: 64px;
-    display: block;
-    margin: 0 auto 6px;
+  .character-name {
+    font-weight: bold;
+    font-size: 18px;
   }
   .hp-bar {
-    background: #330044;
-    height: 10px;
-    border: 1px solid white;
-    margin-top: 6px;
+    background: #333;
+    border: 1px solid #666;
+    width: 100%;
+    height: 15px;
+    position: relative;
+    margin-top: 4px;
   }
   .hp-fill {
-    background: #00ff88;
+    background: #0f0;
     height: 100%;
     width: 100%;
   }
-  #action-menu, #talk-options {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
+  #action-menu, #talk-menu, #mini-game, #result-popup {
+    margin-top: 20px;
   }
-  .action-button, .talk-button {
-    background: #111;
-    border: 2px solid white;
-    padding: 6px 8px;
+  .option {
+    background: #222;
+    border: 2px solid #666;
+    padding: 8px 12px;
+    margin: 5px 0;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 14px;
+  }
+  .option.selected {
+    background: #08f;
+    border-color: #0af;
+    color: white;
+  }
+  #cancel-button {
+    margin-top: 10px;
+    background: #800000;
+    border: none;
+    padding: 8px 12px;
     color: white;
     cursor: pointer;
-    font-size: 12px;
+    font-family: monospace;
+    font-size: 14px;
   }
-  .action-button:hover, .talk-button:hover {
-    background: #6600cc;
+  #cancel-button:disabled {
+    background: #400000;
+    cursor: not-allowed;
   }
-  .disabled {
-    opacity: 0.4;
-    pointer-events: none;
-  }
-  #dialog-box {
-    border: 4px solid white;
+  #message-box {
+    margin-top: 15px;
+    background: #111;
     padding: 10px;
-    background: black;
-    min-height: 48px;
-    box-shadow: inset 0 0 0 4px #6600cc;
+    border: 2px solid #08f;
+    min-height: 60px;
+    font-size: 14px;
   }
-  #controls {
-    margin-top: 8px;
-    display: flex;
-    justify-content: space-between;
+  /* Mini-game styles */
+  #mini-game {
+    position: relative;
+    height: 150px;
+    background: #000022;
+    border: 2px solid #0af;
+    overflow: hidden;
   }
-  #launch-btn, #back-btn {
-    background: #111;
-    border: 2px solid white;
-    color: white;
-    padding: 6px 12px;
-    font-family: 'Press Start 2P';
-    cursor: pointer;
+  .target {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: #f00;
+    border-radius: 50%;
+    cursor: crosshair;
+    animation: pop 1.2s ease-in-out infinite;
+  }
+  @keyframes pop {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-40px); }
+  }
+  #cursor {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #0af;
+    border-radius: 50%;
+    pointer-events: none;
+    mix-blend-mode: difference;
   }
 </style>
 </head>
 <body>
+
 <div id="battle-container">
-  <div id="battle-area">
-    <div id="enemy-sprite"></div>
+  <div id="status-bars">
+    <!-- Characters HP -->
   </div>
-  <div id="party-menu"></div>
-  <div id="action-menu"></div>
-  <div id="talk-options" style="display: none;"></div>
-  <div id="dialog-box">Pomgrante's turn!</div>
-  <div id="controls">
-    <button id="back-btn" disabled>Back</button>
-    <button id="launch-btn" style="display:none;">Launch Attack</button>
+
+  <div id="turn-indicator" style="font-weight:bold; font-size: 16px; margin-bottom:10px;"></div>
+
+  <div id="action-menu">
+    <!-- Attack / Talk -->
+  </div>
+
+  <div id="talk-menu" style="display:none;">
+    <!-- Talk Options -->
+  </div>
+
+  <button id="cancel-button" style="display:none;">Cancel</button>
+
+  <div id="message-box">Welcome to the battle! Your turn: Pomgrante</div>
+
+  <div id="mini-game" style="display:none;">
+    <!-- Mini-game targets and cursor -->
+    <div id="cursor"></div>
+  </div>
+
+  <div id="result-popup" style="display:none; margin-top: 15px; background: #080; padding: 10px; font-weight: bold; border-radius: 6px;">
+    <!-- Result after mini-game -->
   </div>
 </div>
+
 <script>
-// Placeholder party setup and logic will be here.
+  // Characters and their status
+  const characters = [
+    {
+      name: "Pomgrante",
+      maxHP: 100,
+      hp: 100,
+      role: "attacker",
+      buffs: [],
+      talkOptions: ["Let's do this!", "I got your back!", "Stay sharp!"],
+    },
+    {
+      name: "Potota",
+      maxHP: 160,
+      hp: 160,
+      role: "support",
+      buffs: [],
+      talkOptions: ["You can do it!", "I believe in you!", "Stay strong!"],
+    },
+    {
+      name: "Burger Shirt",
+      maxHP: 120,
+      hp: 120,
+      role: "mercy",
+      buffs: [],
+      talkOptions: ["Please don't hurt us!", "Let's talk it out!", "Mercy, please!"],
+    },
+  ];
+
+  const enemy = {
+    name: "Layla",
+    maxHP: 500,
+    hp: 500,
+  };
+
+  let turnIndex = 0; // Index of character whose turn it is
+  let inTalkMenu = false;
+  let selectedTalkOptionIndex = 0;
+  let inMiniGame = false;
+  let miniGameHits = 0;
+
+  const statusBarsDiv = document.getElementById("status-bars");
+  const turnIndicator = document.getElementById("turn-indicator");
+  const actionMenu = document.getElementById("action-menu");
+  const talkMenu = document.getElementById("talk-menu");
+  const cancelButton = document.getElementById("cancel-button");
+  const messageBox = document.getElementById("message-box");
+  const miniGameDiv = document.getElementById("mini-game");
+  const cursorDiv = document.getElementById("cursor");
+  const resultPopup = document.getElementById("result-popup");
+
+  // Initialize HP bars UI
+  function renderStatusBars() {
+    statusBarsDiv.innerHTML = "";
+
+    characters.forEach((char, idx) => {
+      const charDiv = document.createElement("div");
+      charDiv.className = "character";
+      charDiv.id = "char-" + idx;
+
+      const nameDiv = document.createElement("div");
+      nameDiv.className = "character-name";
+      nameDiv.textContent = `${char.name} ${idx === turnIndex ? "(Your Turn)" : ""}`;
+
+      const hpBar = document.createElement("div");
+      hpBar.className = "hp-bar";
+
+      const hpFill = document.createElement("div");
+      hpFill.className = "hp-fill";
+      const hpPercent = Math.max(0, (char.hp / char.maxHP) * 100);
+      hpFill.style.width = hpPercent + "%";
+
+      hpBar.appendChild(hpFill);
+      charDiv.appendChild(nameDiv);
+      charDiv.appendChild(hpBar);
+      statusBarsDiv.appendChild(charDiv);
+    });
+
+    // Enemy bar
+    const enemyDiv = document.createElement("div");
+    enemyDiv.className = "character";
+
+    const enemyNameDiv = document.createElement("div");
+    enemyNameDiv.className = "character-name";
+    enemyNameDiv.textContent = enemy.name;
+
+    const enemyHpBar = document.createElement("div");
+    enemyHpBar.className = "hp-bar";
+
+    const enemyHpFill = document.createElement("div");
+    enemyHpFill.className = "hp-fill";
+    enemyHpFill.style.background = "#f00";
+    const enemyHpPercent = Math.max(0, (enemy.hp / enemy.maxHP) * 100);
+    enemyHpFill.style.width = enemyHpPercent + "%";
+
+    enemyHpBar.appendChild(enemyHpFill);
+    enemyDiv.appendChild(enemyNameDiv);
+    enemyDiv.appendChild(enemyHpBar);
+    statusBarsDiv.appendChild(enemyDiv);
+  }
+
+  function updateTurnIndicator() {
+    turnIndicator.textContent = `Turn: ${characters[turnIndex].name}`;
+  }
+
+  function showActionMenu() {
+    actionMenu.style.display = "block";
+    talkMenu.style.display = "none";
+    cancelButton.style.display = "none";
+    resultPopup.style.display = "none";
+    miniGameDiv.style.display = "none";
+
+    actionMenu.innerHTML = "";
+    const attackOption = document.createElement("div");
+    attackOption.className = "option selected";
+    attackOption.textContent = "Attack (Gun)";
+    actionMenu.appendChild(attackOption);
+
+    const talkOption = document.createElement("div");
+    talkOption.className = "option";
+    talkOption.textContent = "Talk";
+    actionMenu.appendChild(talkOption);
+
+    selectedActionIndex = 0;
+  }
+
+  function showTalkMenu() {
+    actionMenu.style.display = "none";
+    talkMenu.style.display = "block";
+    cancelButton.style.display = "inline-block";
+    resultPopup.style.display = "none";
+    miniGameDiv.style.display = "none";
+
+    talkMenu.innerHTML = "";
+
+    const char = characters[turnIndex];
+    char.talkOptions.forEach((opt, idx) => {
+      const optDiv = document.createElement("div");
+      optDiv.className = "option";
+      if (idx === selectedTalkOptionIndex) {
+        optDiv.classList.add("selected");
+      }
+      optDiv.textContent = opt;
+      talkMenu.appendChild(optDiv);
+    });
+  }
+
+  // Keyboard handling for menus
+  let selectedActionIndex = 0;
+
+  function updateActionSelection() {
+    const options = actionMenu.querySelectorAll(".option");
+    options.forEach((opt, idx) => {
+      opt.classList.toggle("selected", idx === selectedActionIndex);
+    });
+  }
+
+  function updateTalkSelection() {
+    const options = talkMenu.querySelectorAll(".option");
+    options.forEach((opt, idx) => {
+      opt.classList.toggle("selected", idx === selectedTalkOptionIndex);
+    });
+  }
+
+  // Switch turns
+  function nextTurn() {
+    // Reset mini game state
+    miniGameHits = 0;
+    inMiniGame = false;
+    resultPopup.style.display = "none";
+    miniGameDiv.style.display = "none";
+
+    // Next character turn (loop)
+    turnIndex++;
+    if (turnIndex >= characters.length) turnIndex = 0;
+
+    messageBox.textContent = `Your turn: ${characters[turnIndex].name}`;
+
+    updateTurnIndicator();
+    renderStatusBars();
+    showActionMenu();
+  }
+
+  // Attack sequence: only Pomgrante attacks trigger mini-game
+  function performAttack() {
+    messageBox.textContent = `${characters[turnIndex].name} prepares to attack!`;
+    if (characters[turnIndex].name === "Pomgrante") {
+      startMiniGame();
+    } else if (characters[turnIndex].name === "Potota") {
+      messageBox.textContent = "Potota can only buff, not attack!";
+      // Skip attack and go to next turn
+      setTimeout(nextTurn, 2000);
+    } else if (characters[turnIndex].name === "Burger Shirt") {
+      messageBox.textContent = "Burger Shirt asks for mercy instead of attacking!";
+      setTimeout(nextTurn, 2000);
+    }
+  }
+
+  // Talk sequence for flavor and buffs
+  function performTalk() {
+    const char = characters[turnIndex];
+    const talkLine = char.talkOptions[selectedTalkOptionIndex];
+    messageBox.textContent = `${char.name} says: "${talkLine}"`;
+
+    if (char.name === "Potota") {
+      messageBox.textContent += " (Potota encourages, +5 damage for next attack)";
+      char.buffs.push("encourage");
+    }
+    if (char.name === "Burger Shirt") {
+      messageBox.textContent += " (Burger Shirt asks for mercy)";
+    }
+
+    setTimeout(nextTurn, 2500);
+  }
+
+  // Cancel button handler - goes back one step from talk menu to action menu
+  cancelButton.onclick = () => {
+    if (inTalkMenu) {
+      inTalkMenu = false;
+      showActionMenu();
+    }
+  };
+
+  // Keydown handler for controlling menus
+  document.addEventListener("keydown", (e) => {
+    if (inMiniGame) return; // no menu control in mini game
+
+    if (inTalkMenu) {
+      if (e.key === "ArrowUp") {
+        selectedTalkOptionIndex = (selectedTalkOptionIndex - 1 + characters[turnIndex].talkOptions.length) % characters[turnIndex].talkOptions.length;
+        updateTalkSelection();
+      } else if (e.key === "ArrowDown") {
+        selectedTalkOptionIndex = (selectedTalkOptionIndex + 1) % characters[turnIndex].talkOptions.length;
+        updateTalkSelection();
+      } else if (e.key === "Enter") {
+        performTalk();
+      } else if (e.key === "Escape") {
+        cancelButton.click();
+      }
+    } else {
+      // action menu control
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        selectedActionIndex = (selectedActionIndex === 0) ? 1 : 0;
+        updateActionSelection();
+      } else if (e.key === "Enter") {
+        if (selectedActionIndex === 0) {
+          // Attack selected
+          performAttack();
+        } else {
+          // Talk selected
+          inTalkMenu = true;
+          selectedTalkOptionIndex = 0;
+          showTalkMenu();
+        }
+      }
+    }
+  });
+
+  // Mini-game logic: Shoot cans (targets)
+  function startMiniGame() {
+    inMiniGame = true;
+    miniGameHits = 0;
+    actionMenu.style.display = "none";
+    talkMenu.style.display = "none";
+    cancelButton.style.display = "none";
+    miniGameDiv.style.display = "block";
+    messageBox.textContent = "Mini-game started! Shoot the cans! (Use mouse clicks)";
+    resultPopup.style.display = "none";
+
+    miniGameDiv.innerHTML = "<div id='cursor'></div>";
+
+    const cursor = document.getElementById("cursor");
+    miniGameDiv.appendChild(cursor);
+
+    // Create multiple targets popping up and down
+    const targets = [];
+    for (let i = 0; i < 5; i++) {
+      const target = document.createElement("div");
+      target.className = "target";
+      target.style.left = (i * 100 + 20) + "px";
+      target.style.top = "100px";
+      miniGameDiv.appendChild(target);
+      targets.push(target);
+    }
+
+    // Track mouse movement for cursor
+    miniGameDiv.onmousemove = (e) => {
+      const rect = miniGameDiv.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      cursor.style.left = (x - 12) + "px";
+      cursor.style.top = (y - 12) + "px";
+    };
+
+    // Click on targets to "shoot"
+    targets.forEach(target => {
+      target.onclick = () => {
+        miniGameHits++;
+        target.style.background = "#0f0";
+        setTimeout(() => {
+          target.style.background = "#f00";
+        }, 300);
+        if (miniGameHits >= 3) {
+          endMiniGame();
+        }
+      };
+    });
+  }
+
+  function endMiniGame() {
+    inMiniGame = false;
+    miniGameDiv.style.display = "none";
+
+    // Calculate damage from hits
+    const dmgPerHit = 15 + Math.floor(Math.random() * 6); // 15-20 damage per hit
+    const totalDamage = dmgPerHit * miniGameHits;
+
+    // Check buffs (Potota's encourage)
+    let buffedDamage = totalDamage;
+    if (characters.some(c => c.buffs.includes("encourage"))) {
+      buffedDamage = Math.floor(totalDamage * 1.2);
+      characters.forEach(c => {
+        c.buffs = c.buffs.filter(b => b !== "encourage");
+      });
+    }
+
+    enemy.hp -= buffedDamage;
+    if (enemy.hp < 0) enemy.hp = 0;
+
+    messageBox.textContent = `Pomgrante did ${buffedDamage} damage!`;
+
+    renderStatusBars();
+
+    if (enemy.hp === 0) {
+      messageBox.textContent = "You won the battle! Layla is defeated!";
+      resultPopup.style.display = "block";
+      resultPopup.textContent = "Victory! Proceed to next comic page.";
+    } else {
+      setTimeout(() => {
+        enemyTurn();
+      }, 2000);
+    }
+  }
+
+  // Enemy attacks for 30-50 damage
+  function enemyTurn() {
+    messageBox.textContent = "Layla attacks!";
+    setTimeout(() => {
+      // Randomly pick target (player)
+      const targetIndex = Math.floor(Math.random() * characters.length);
+      let dmg = 30 + Math.floor(Math.random() * 21); // 30-50 damage
+      characters[targetIndex].hp -= dmg;
+      if (characters[targetIndex].hp < 0) characters[targetIndex].hp = 0;
+
+      messageBox.textContent = `Layla did ${dmg} damage to ${characters[targetIndex].name}!`;
+      renderStatusBars();
+
+      // Check if player is dead
+      if (characters[targetIndex].hp === 0) {
+        messageBox.textContent = `${characters[targetIndex].name} has been knocked out! Game Over!`;
+        actionMenu.style.display = "none";
+        talkMenu.style.display = "none";
+        cancelButton.style.display = "none";
+        return; // end game
+      }
+
+      // Next turn
+      setTimeout(() => {
+        nextTurn();
+      }, 2500);
+    }, 1500);
+  }
+
+  // Initialize UI
+  renderStatusBars();
+  updateTurnIndicator();
+  showActionMenu();
 </script>
+
 </body>
 </html>
-
