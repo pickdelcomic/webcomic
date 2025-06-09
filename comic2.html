@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Comic 2 - Empty Pages</title>
-  
-  <!-- Link to XP.css for Windows XP Styling -->
-  <link rel="stylesheet" href="https://unpkg.com/xp.css">
+  <meta charset="UTF-8" />
+  <title>Comic 2 - Game Panel</title>
+
+  <!-- XP.css for styling -->
+  <link rel="stylesheet" href="https://unpkg.com/xp.css" />
 
   <style>
     body {
@@ -35,22 +35,26 @@
       padding: 15px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       display: none;
-      min-height: 400px; /* so empty panels have some height */
+      min-height: 450px; /* space for game */
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    .panel img {
+    /* For the game container */
+    #game-container {
       width: 100%;
-      height: auto;
-      border: 2px solid #2e4f8f;
-      margin-bottom: 10px;
+      height: 400px;
+      background: black;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      user-select: none;
     }
 
-    .panel p {
-      color: #2e4f8f;
-      font-size: 14px;
-      text-align: left;
-    }
-
+    /* Navigation styles */
     .navigation {
       margin-top: 20px;
       text-align: center;
@@ -88,16 +92,12 @@
 </head>
 
 <body>
-
-  <!-- Comic Panels -->
   <div class="comic-container" id="comicContainer">
-    <!-- Panels will be injected here -->
+    <!-- Panels injected here -->
   </div>
 
-  <!-- Progress Indicator -->
   <p id="progress"></p>
 
-  <!-- Navigation Buttons -->
   <div class="navigation">
     <button class="nav-button" id="prevButton" onclick="navigate(-1)" disabled>Previous</button>
     <button class="nav-button" id="nextButton" onclick="navigate(1)">Next</button>
@@ -106,68 +106,66 @@
   </div>
 
   <script>
-    // Empty panels for Comic 2 — 10 blank pages for example
+    // Comic 2 Panels: only panel 1 has a game, others empty
     const comicPanels = [
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" }
+      {
+        // Panel 1 with embedded game container
+        content: `
+          <div id="game-container">
+            <!-- Simple placeholder game or your game iframe can go here -->
+            <p>Simple Game Placeholder: Press Space to jump! (Imagine a game here)</p>
+          </div>
+        `,
+      },
+      { content: "" },
+      { content: "" },
+      { content: "" },
+      { content: "" },
+      { content: "" },
+      { content: "" },
+      { content: "" },
+      { content: "" },
+      { content: "" }
+      // Add as many panels as you want, empty for now
     ];
 
     let currentPanel = 0;
 
     function loadComic() {
-      const container = document.getElementById('comicContainer');
+      const container = document.getElementById("comicContainer");
       comicPanels.forEach((panel, index) => {
-        const div = document.createElement('div');
-        div.className = 'panel';
-        div.style.display = index === 0 ? 'block' : 'none';
-
-        // If there is an image, show it, else just leave empty
-        let innerHTML = '';
-        if (panel.image) {
-          innerHTML += `<img src="${panel.image}" alt="Panel ${index + 1}">`;
-        }
-        if (panel.text) {
-          innerHTML += `<p>${panel.text}</p>`;
-        }
-
-        div.innerHTML = innerHTML;
+        const div = document.createElement("div");
+        div.className = "panel";
+        div.style.display = index === 0 ? "flex" : "none";
+        div.innerHTML = panel.content;
         container.appendChild(div);
       });
       updateProgress();
     }
 
     function navigate(direction) {
-      const panels = document.querySelectorAll('.panel');
+      const panels = document.querySelectorAll(".panel");
       const newIndex = currentPanel + direction;
       if (newIndex >= 0 && newIndex < panels.length) {
-        panels[currentPanel].style.display = 'none';
+        panels[currentPanel].style.display = "none";
         currentPanel = newIndex;
-        panels[currentPanel].style.display = 'block';
-        document.getElementById('prevButton').disabled = currentPanel === 0;
-        document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
+        panels[currentPanel].style.display = "flex";
+        document.getElementById("prevButton").disabled = currentPanel === 0;
+        document.getElementById("nextButton").disabled = currentPanel === panels.length - 1;
         updateProgress();
       }
     }
 
     function updateProgress() {
-      document.getElementById('progress').textContent = `Page ${currentPanel + 1} of ${comicPanels.length}`;
+      document.getElementById("progress").textContent = `Page ${currentPanel + 1} of ${comicPanels.length}`;
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') navigate(1);
-      if (e.key === 'ArrowLeft') navigate(-1);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") navigate(1);
+      if (e.key === "ArrowLeft") navigate(-1);
     });
 
-    document.addEventListener('DOMContentLoaded', loadComic);
+    document.addEventListener("DOMContentLoaded", loadComic);
   </script>
-
 </body>
 </html>
