@@ -3,21 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <title>oh a evil guy</title>
+  
   <!-- Link to XP.css for Windows XP Styling -->
   <link rel="stylesheet" href="https://unpkg.com/xp.css">
-  
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-CR9QE2X88K"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-CR9QE2X88K');
-</script>
-  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CR9QE2X88K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-CR9QE2X88K');
+  </script>
+
   <style>
-    /* Additional Custom Styles */
     body {
       background-color: #0033cc;
       color: white;
@@ -25,37 +24,46 @@
       padding: 0;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
+
     .comic-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
     }
+
     .panel {
-      width: 80%;
+      width: 95%;
       max-width: 800px;
       background-color: #f0f0f0;
       border: 2px solid #2e4f8f;
       margin: 10px 0;
       padding: 15px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      display: none; /* Initially hide all panels */
+      display: none;
     }
+
     .panel img {
       width: 100%;
       height: auto;
       border: 2px solid #2e4f8f;
       margin-bottom: 10px;
     }
+
     .panel p {
       color: #2e4f8f;
       font-size: 14px;
       text-align: left;
     }
+
     .navigation {
       margin-top: 20px;
       text-align: center;
     }
+
     .nav-button {
       background-color: transparent;
       color: #2e4f8f;
@@ -67,19 +75,21 @@
       font-size: 16px;
       transition: background-color 0.3s, color 0.3s;
     }
+
     .nav-button:hover {
       background-color: #2e4f8f;
       color: white;
     }
+
     .nav-button:disabled {
       color: #888;
       border-color: #888;
       cursor: not-allowed;
     }
-          .shaky {
+
+    .shaky {
       display: inline-block;
       animation: shake 0.15s infinite;
-            
     }
 
     @keyframes shake {
@@ -95,14 +105,24 @@
       90%  { transform: translate(1px, 2px) rotate(0deg); }
       100% { transform: translate(1px, -2px) rotate(-1deg); }
     }
+
+    #progress {
+      text-align: center;
+      margin-top: 10px;
+      color: white;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Comic Panels -->
   <div class="comic-container" id="comicContainer">
-    <!-- Panels will be injected here by JavaScript -->
+    <!-- Panels will be injected here -->
   </div>
+
+  <!-- Progress Indicator -->
+  <p id="progress"></p>
 
   <!-- Navigation Buttons -->
   <div class="navigation">
@@ -113,7 +133,6 @@
   </div>
 
   <script>
-    // Comic panel data
     const comicPanels = [
       { image: "pages/png1.png", text: "..." },
       { image: "pages/Png2.png", text: "..." },
@@ -126,54 +145,54 @@
       { image: "pages/Png10.gif", text: "POM an POT: *looks behinde JUMPS BACK SCARED going like AHHHHH WHA THA ??!!?! AAHHhhh...<br><br><br> dang red line..." },
       { image: "pages/Png9.png", text: "<span style='color:#434a4f;'>INTRODUCING DR. EVIL<br><br>UNIT'S PURPOSE: MAKER OF EVIL STUFF like idk the french<br><br>HP: 200 &nbsp;&nbsp; DMG: 50<br><br>ABILITIES and TRAITS:<br>ROCK IIIII<br>SMARTS IIIII<br>EVILNESS I<br>BULLET PROOF III</span>" },
       { image: "pages/Png11.png", text: "<span style='color:#DC143C;'>POM : hold up err we me and my brother are just here to.... AH HEAR ABOUTH YOU [pomgrante used LYING it was very effective]</span><br><br><span style='color:#434a4f;'>DR : OOOOHHH well if you wanna know all about ME</span>" },
-       { image: "pages/Png12.gif", text: "<span style='color:#434a4f;'>DR : ive made sooo MANY evil things like clowns, people who ride scooters, the word MOIST ,goatees, goat ,soundcloud rappers and the BEST thing ive made the BIRD FLU--</span><br><br><span style='color:#800080;'>POT : yea they tend to do that</span>" },
-       { image: "pages/Png13.png", text: "<span style='color:#434a4f;'>DR : LOOK WHERE AM POINTING THE BIRD FLU LOOK! LOOK!</span><br><br><span style='color:#800080;'>POT: OOOOOH BIRD FLU like the sickness</span>" },
-       { image: "pages/Png14.png", text: "<span style='color:#DC143C;'> <span class='shaky'>POM : THE BIRD FLU KILLED MY BEST FREAIND WHEN I WAS A CHILD</span>" },
-       { image: "pages/Png15.png", text: "<span style='color:#DC143C;'>POM : I POMGRANTE CHALLENGE YOU DR EVIL TO A BATTEL REASON <span class='shaky'>REVANGE</span><br><br><span style='color:#800080;'>POT : what if he's apologies and becomes DR. GOOD</span><br><br><span style='color:#434a4f;'>DR: no</span>" },
-       { image: "pages/Png16.gif", text: "[BATTEL LOG STARTER]<br><br><span style='color:#800080;'>[POTOTA USES ENCOURAGE ON POMGRANTE]</span><br><br><span style='color:#DC143C;'>[POMGRANTE GAINS +5 COMBAT DAMGE, POMGRANTE USES GUN IT DOES 0 DMG]<br>POM : FUDGE HE'S BULLET PROOF!<br><br></span><span style='color:#434a4f;'>[DR. EVIL USES FLASK OF BURNING COOL-AID DEALS 50 DMG and 5 PERMANENT]<br><br></span><span style='color:#DC143C;'>[POMGRANTE HP 50/95]<br>POM : WHO DRINKS COOL-AID HOTTTT!!?</span>" },
-       { image: "pages/Png17.png", text: "<span style='color:#800080;'>POT : HMMMMM hes bullet proof but is he potota proof?</span><br><br><span style='color:#DC143C;'>POM : what are you getting at, what we use you as ammo?</span><br><br><span style='color:#800080;'>POT : yuppers!</span><br><br>" },
-       { image: "pages/Png18.gif", text: "[BATTEL LOG CONTINUED]<br><br>[POMGRANTE AND POTOTA USE THEREE SUPER MOVE POTOTA LAUNCHER DEALS 500 DMG]<br><br>[DR. EVIL HAS BEEN KNOCKED OUT you could say in a way]" },
-       { image: "pages/Png19.png", text: "and so these two brother won agaist a evil doctor guy so yk he would't make more evil stuff stay tuned folks</span>" },
-       { image: "pages/Love.gif", text: "thanks for reading this comic might be a bit funky with stray pixels but i promise it will get much better<br>made by me pickdel [micah del angel]<br><br>thanks to my buddy addison for giving a list of evil thing for dr evil to say" },
-      // Add more panels here if needed
+      { image: "pages/Png12.gif", text: "<span style='color:#434a4f;'>DR : ive made sooo MANY evil things like clowns, people who ride scooters, the word MOIST ,goatees, goat ,soundcloud rappers and the BEST thing ive made the BIRD FLU--</span><br><br><span style='color:#800080;'>POT : yea they tend to do that</span>" },
+      { image: "pages/Png13.png", text: "<span style='color:#434a4f;'>DR : LOOK WHERE AM POINTING THE BIRD FLU LOOK! LOOK!</span><br><br><span style='color:#800080;'>POT: OOOOOH BIRD FLU like the sickness</span>" },
+      { image: "pages/Png14.png", text: "<span style='color:#DC143C;'> <span class='shaky'>POM : THE BIRD FLU KILLED MY BEST FREAIND WHEN I WAS A CHILD</span>" },
+      { image: "pages/Png15.png", text: "<span style='color:#DC143C;'>POM : I POMGRANTE CHALLENGE YOU DR EVIL TO A BATTEL REASON <span class='shaky'>REVANGE</span><br><br><span style='color:#800080;'>POT : what if he's apologies and becomes DR. GOOD</span><br><br><span style='color:#434a4f;'>DR: no</span>" },
+      { image: "pages/Png16.gif", text: "[BATTEL LOG STARTER]<br><br><span style='color:#800080;'>[POTOTA USES ENCOURAGE ON POMGRANTE]</span><br><br><span style='color:#DC143C;'>[POMGRANTE GAINS +5 COMBAT DAMGE, POMGRANTE USES GUN IT DOES 0 DMG]<br>POM : FUDGE HE'S BULLET PROOF!<br><br></span><span style='color:#434a4f;'>[DR. EVIL USES FLASK OF BURNING COOL-AID DEALS 50 DMG and 5 PERMANENT]<br><br></span><span style='color:#DC143C;'>[POMGRANTE HP 50/95]<br>POM : WHO DRINKS COOL-AID HOTTTT!!?</span>" },
+      { image: "pages/Png17.png", text: "<span style='color:#800080;'>POT : HMMMMM hes bullet proof but is he potota proof?</span><br><br><span style='color:#DC143C;'>POM : what are you getting at, what we use you as ammo?</span><br><br><span style='color:#800080;'>POT : yuppers!</span>" },
+      { image: "pages/Png18.gif", text: "[BATTEL LOG CONTINUED]<br><br>[POMGRANTE AND POTOTA USE THEREE SUPER MOVE POTOTA LAUNCHER DEALS 500 DMG]<br><br>[DR. EVIL HAS BEEN KNOCKED OUT you could say in a way]" },
+      { image: "pages/Png19.png", text: "and so these two brother won agaist a evil doctor guy so yk he would't make more evil stuff stay tuned folks" },
+      { image: "pages/Love.gif", text: "thanks for reading this comic might be a bit funky with stray pixels but i promise it will get much better<br>made by me pickdel [micah del angel]<br><br>thanks to my buddy addison for giving a list of evil thing for dr evil to say" },
     ];
 
-    // Function to load panels into the comic container
+    let currentPanel = 0;
+
     function loadComic() {
       const container = document.getElementById('comicContainer');
       comicPanels.forEach((panel, index) => {
-        const panelDiv = document.createElement('div');
-        panelDiv.classList.add('panel');
-        if (index === 0) panelDiv.style.display = 'block'; // Display the first panel
-
-        const img = document.createElement('img');
-        img.src = panel.image;
-        img.alt = 'Comic Image ' + (index + 1);
-
-        const text = document.createElement('p');
-text.innerHTML = panel.text;
-        
-        panelDiv.appendChild(img);
-        panelDiv.appendChild(text);
-        container.appendChild(panelDiv);
+        const div = document.createElement('div');
+        div.className = 'panel';
+        div.style.display = index === 0 ? 'block' : 'none';
+        div.innerHTML = `<img src="${panel.image}" alt="Panel ${index + 1}"><p>${panel.text}</p>`;
+        container.appendChild(div);
       });
+      updateProgress();
     }
 
-    // Function to navigate through panels
-    let currentPanel = 0;
     function navigate(direction) {
       const panels = document.querySelectorAll('.panel');
-      panels[currentPanel].style.display = 'none'; // Hide current panel
-      currentPanel += direction;
-      panels[currentPanel].style.display = 'block'; // Show new panel
-
-      // Update button states
-      document.getElementById('prevButton').disabled = currentPanel === 0;
-      document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
+      const newIndex = currentPanel + direction;
+      if (newIndex >= 0 && newIndex < panels.length) {
+        panels[currentPanel].style.display = 'none';
+        currentPanel = newIndex;
+        panels[currentPanel].style.display = 'block';
+        document.getElementById('prevButton').disabled = currentPanel === 0;
+        document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
+        updateProgress();
+      }
     }
 
-    // Initial load
-    loadComic();
+    function updateProgress() {
+      document.getElementById('progress').textContent = `Page ${currentPanel + 1} of ${comicPanels.length}`;
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') navigate(1);
+      if (e.key === 'ArrowLeft') navigate(-1);
+    });
+
+    document.addEventListener('DOMContentLoaded', loadComic);
   </script>
 
 </body>
