@@ -1,261 +1,344 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Pixel Battle Comic</title>
-  
-  <!-- Pixel Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-  
-  <style>
-    /* Reset */
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      background: #111;
-      color: #eee;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 12px;
-      margin: 0;
-      padding: 10px;
-      user-select: none;
-    }
-    
-    /* Pixelated images */
-    img, canvas {
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-    }
-    
-    /* Container */
-    #container {
-      max-width: 900px;
-      margin: 0 auto;
-      border: 4px solid #eee;
-      background: #222;
-      padding: 10px;
-      box-shadow: 6px 6px 0 #550088;
-    }
-    
-    /* Party UI */
-    #party {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 15px;
-      gap: 15px;
-    }
-    .char-box {
-      border: 3px solid #eee;
-      padding: 6px;
-      cursor: pointer;
-      background: #000;
-      width: 100px;
-      text-align: center;
-      box-shadow: 3px 3px 0 #550088;
-      transition: background 0.3s;
-    }
-    .char-box.selected {
-      background: #7700cc;
-      box-shadow: 3px 3px 0 #cc55ff;
-    }
-    .char-box img {
-      width: 64px;
-      height: 64px;
-      margin-bottom: 6px;
-    }
-    
-    /* Battle area */
-    #battle {
-      background: #000;
-      border: 4px solid #eee;
-      height: 200px;
-      margin-bottom: 15px;
-      box-shadow: inset 0 0 12px #7700cc;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #eee;
-      font-size: 14px;
-      position: relative;
-    }
-    
-    /* Info box for character HP, etc */
-    #char-info {
-      position: absolute;
-      bottom: 5px;
-      left: 5px;
-      font-size: 11px;
-      background: rgba(0,0,0,0.7);
-      padding: 4px 8px;
-      border: 2px solid #eee;
-      box-shadow: 2px 2px 0 #550088;
-    }
-    
-    /* Comic panel */
-    #comicPanel {
-      background: #111;
-      border: 4px solid #eee;
-      padding: 10px;
-      box-shadow: 6px 6px 0 #550088;
-      color: #eee;
-      min-height: 120px;
-      font-size: 12px;
-    }
-    
-    /* Navigation buttons */
-    #navButtons {
-      margin-top: 15px;
-      text-align: center;
-    }
-    button {
-      background: #222;
-      border: 3px solid #eee;
-      color: #eee;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 12px;
-      padding: 8px 12px;
-      margin: 0 6px;
-      cursor: pointer;
-      box-shadow: 2px 2px 0 #550088;
-      transition: background 0.2s, color 0.2s;
-    }
-    button:hover {
-      background: #7700cc;
-      color: #fff;
-      box-shadow: 2px 2px 6px #cc55ff;
-    }
-    button:disabled {
-      color: #666;
-      border-color: #666;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-  </style>
-</head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Deltarune-Style Battle UI Prototype</title>
 
+<!-- Pixel font -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+
+<style>
+  /* Reset */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0;
+    background: #000;
+    font-family: 'Press Start 2P', cursive;
+    color: #fff;
+    user-select: none;
+  }
+
+  /* Main container */
+  #battle-container {
+    max-width: 720px;
+    margin: 20px auto;
+    border: 4px solid #fff;
+    background: #111;
+    box-shadow: 0 0 0 4px #6600cc;
+    position: relative;
+    padding: 12px;
+  }
+
+  /* Battle area */
+  #battle-area {
+    background: #222;
+    border: 2px solid #fff;
+    height: 200px;
+    position: relative;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Placeholder enemy sprite */
+  #enemy-sprite {
+    width: 96px;
+    height: 96px;
+    image-rendering: pixelated;
+    background: url('https://i.imgur.com/jGXmnYI.png') center center no-repeat;
+    background-size: contain;
+    filter: drop-shadow(1px 1px 0 #6600cc);
+  }
+
+  /* Party menu */
+  #party-menu {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .party-member {
+    border: 3px solid #fff;
+    background: #000;
+    padding: 6px;
+    width: 160px;
+    box-shadow: 2px 2px 0 #6600cc;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .party-member.selected {
+    background: #6600cc;
+  }
+
+  .party-member img {
+    width: 64px;
+    height: 64px;
+    image-rendering: pixelated;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .party-member .name {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .party-member .hp-bar {
+    background: #330044;
+    height: 10px;
+    margin-top: 6px;
+    position: relative;
+    border: 1px solid #fff;
+  }
+
+  .party-member .hp-fill {
+    background: #00ff88;
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Action menu */
+  #action-menu {
+    border: 3px solid #fff;
+    background: #000;
+    padding: 8px;
+    box-shadow: 2px 2px 0 #6600cc;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .action-button {
+    background: #111;
+    border: 2px solid #fff;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #fff;
+    transition: background 0.2s;
+    user-select: none;
+  }
+
+  .action-button:hover {
+    background: #6600cc;
+    color: #fff;
+  }
+
+  .action-button.disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  /* Dialog box */
+  #dialog-box {
+    border: 4px solid #fff;
+    background: #111;
+    margin-top: 12px;
+    padding: 10px;
+    font-size: 14px;
+    min-height: 40px;
+    box-shadow: 0 0 0 4px #6600cc inset;
+  }
+</style>
+</head>
 <body>
-  <div id="container">
-    
-    <!-- Party UI -->
-    <div id="party">
-      <!-- Characters will be added here -->
-    </div>
-    
-    <!-- Battle Area -->
-    <div id="battle">
-      <div id="char-info"></div>
-      <div id="battle-content">Battle will go here</div>
-    </div>
-    
-    <!-- Comic Panel -->
-    <div id="comicPanel">Comic text will show here.</div>
-    
-    <!-- Navigation -->
-    <div id="navButtons">
-      <button id="prevBtn" disabled>Previous</button>
-      <button id="nextBtn">Next</button>
-    </div>
+
+<div id="battle-container">
+
+  <div id="battle-area">
+    <div id="enemy-sprite"></div>
   </div>
-  
-  <script>
-    // Characters data
-    const characters = [
-      {
-        name: "Pomgrante",
-        hp: 100,
-        dmg: 80,
-        img: "https://i.imgur.com/3xwL56R.png" // Replace with your pixel art image URL
-      },
-      {
-        name: "Potota",
-        hp: 160,
-        dmg: 20,
-        img: "https://i.imgur.com/d6EqIcM.png"
-      },
-      {
-        name: "Burger Shirt",
-        hp: 120,
-        dmg: 40,
-        img: "https://i.imgur.com/bwVYrML.png"
-      }
-    ];
-    
-    // Comic pages (simple example)
-    const comicPages = [
-      "Pomgrante and Potota face off against Layla!",
-      "Layla casts a powerful spell!",
-      "Potota encourages Pomgrante.",
-      "Battle intensifies..."
-    ];
-    
-    let currentCharIndex = 0;
-    let currentPageIndex = 0;
-    
-    // Setup Party UI
-    const partyDiv = document.getElementById('party');
-    characters.forEach((char, idx) => {
-      const box = document.createElement('div');
-      box.className = 'char-box';
-      if(idx === currentCharIndex) box.classList.add('selected');
-      box.innerHTML = `<img src="${char.img}" alt="${char.name}"><div>${char.name}</div>`;
-      box.addEventListener('click', () => switchCharacter(idx));
-      partyDiv.appendChild(box);
-    });
-    
-    // Update selected character style & info
-    function switchCharacter(idx) {
-      if (idx === currentCharIndex) return;
-      currentCharIndex = idx;
-      updatePartyUI();
-      updateBattle();
+
+  <div id="party-menu">
+    <!-- Party members injected by JS -->
+  </div>
+
+  <div id="action-menu">
+    <!-- Action buttons injected by JS -->
+  </div>
+
+  <div id="dialog-box">
+    Select an action to start the battle.
+  </div>
+
+</div>
+
+<script>
+  // Characters with their data and moves
+  const party = [
+    {
+      name: 'Pomgrante',
+      hp: 100,
+      maxHp: 100,
+      img: 'https://i.imgur.com/3xwL56R.png',
+      role: 'attacker',
+      moves: ['Attack', 'Special Attack']
+    },
+    {
+      name: 'Potota',
+      hp: 120,
+      maxHp: 120,
+      img: 'https://i.imgur.com/d6EqIcM.png',
+      role: 'support',
+      moves: ['Heal', 'Buff']
+    },
+    {
+      name: 'Burger Shirt',
+      hp: 80,
+      maxHp: 80,
+      img: 'https://i.imgur.com/bwVYrML.png',
+      role: 'mercy',
+      moves: ['Ask for Mercy']
     }
-    
-    function updatePartyUI() {
-      const boxes = document.querySelectorAll('.char-box');
-      boxes.forEach((box, i) => {
-        box.classList.toggle('selected', i === currentCharIndex);
+  ];
+
+  let currentCharIndex = 0;
+  let enemyHp = 200;
+  let dialogBox = document.getElementById('dialog-box');
+
+  const partyMenuDiv = document.getElementById('party-menu');
+  const actionMenuDiv = document.getElementById('action-menu');
+  const battleArea = document.getElementById('battle-area');
+
+  // Render party UI
+  function renderPartyMenu() {
+    partyMenuDiv.innerHTML = '';
+    party.forEach((char, i) => {
+      const memberDiv = document.createElement('div');
+      memberDiv.classList.add('party-member');
+      if (i === currentCharIndex) memberDiv.classList.add('selected');
+      memberDiv.innerHTML = `
+        <img src="${char.img}" alt="${char.name}">
+        <div class="name">${char.name}</div>
+        <div class="hp-bar"><div class="hp-fill" style="width:${(char.hp / char.maxHp) * 100}%;"></div></div>
+      `;
+      memberDiv.addEventListener('click', () => {
+        currentCharIndex = i;
+        renderPartyMenu();
+        renderActionMenu();
+        setDialog(`You switched to ${char.name}.`);
       });
-    }
-    
-    // Update battle content based on current character
-    function updateBattle() {
-      const char = characters[currentCharIndex];
-      const battleContent = document.getElementById('battle-content');
-      const charInfo = document.getElementById('char-info');
-      
-      battleContent.innerHTML = `<img src="${char.img}" alt="${char.name}" width="96" height="96" style="image-rendering: pixelated;">`;
-      charInfo.textContent = `HP: ${char.hp}  DMG: ${char.dmg}`;
-    }
-    
-    // Comic panel navigation
-    const comicPanel = document.getElementById('comicPanel');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    
-    prevBtn.addEventListener('click', () => {
-      if (currentPageIndex > 0) {
-        currentPageIndex--;
-        updateComic();
-      }
+      partyMenuDiv.appendChild(memberDiv);
     });
-    nextBtn.addEventListener('click', () => {
-      if (currentPageIndex < comicPages.length - 1) {
-        currentPageIndex++;
-        updateComic();
+  }
+
+  // Render action menu based on selected character
+  function renderActionMenu() {
+    actionMenuDiv.innerHTML = '';
+    const char = party[currentCharIndex];
+    char.moves.forEach(move => {
+      const btn = document.createElement('button');
+      btn.classList.add('action-button');
+      btn.textContent = move;
+
+      // Disable unsupported moves for Burger Shirt except Ask for Mercy
+      if (char.role === 'mercy' && move !== 'Ask for Mercy') {
+        btn.classList.add('disabled');
+        btn.disabled = true;
       }
+
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        handleAction(move);
+      });
+
+      actionMenuDiv.appendChild(btn);
     });
-    
-    function updateComic() {
-      comicPanel.textContent = comicPages[currentPageIndex];
-      prevBtn.disabled = currentPageIndex === 0;
-      nextBtn.disabled = currentPageIndex === comicPages.length -1;
+  }
+
+  // Display dialog text
+  function setDialog(text) {
+    dialogBox.textContent = text;
+  }
+
+  // Mini-attack game placeholder (for Pomgrante's attack)
+  function miniAttackGame(callback) {
+    setDialog('Mini-game started! Press space quickly to attack!');
+    // Simple timed mini-game simulation:
+    let hits = 0;
+    let maxHits = 5;
+    function hit() {
+      hits++;
+      setDialog(`Hits: ${hits}/${maxHits}`);
+      if (hits >= maxHits) {
+        document.removeEventListener('keydown', onKeydown);
+        callback(hits);
+      }
     }
-    
-    // Initial load
-    updatePartyUI();
-    updateBattle();
-    updateComic();
-  </script>
+    function onKeydown(e) {
+      if (e.code === 'Space') {
+        hit();
+      }
+    }
+    document.addEventListener('keydown', onKeydown);
+
+    // Timeout in 5 seconds if user is slow
+    setTimeout(() => {
+      document.removeEventListener('keydown', onKeydown);
+      setDialog(`Mini-game ended with ${hits} hits.`);
+      callback(hits);
+    }, 5000);
+  }
+
+  // Handle chosen action
+  function handleAction(action) {
+    const char = party[currentCharIndex];
+    if (char.role === 'attacker' && action === 'Attack') {
+      miniAttackGame((hits) => {
+        let damage = hits * 10;
+        enemyHp -= damage;
+        if (enemyHp < 0) enemyHp = 0;
+        setDialog(`${char.name} did ${damage} damage! Enemy HP: ${enemyHp}`);
+        updateEnemyHpBar();
+        if (enemyHp <= 0) {
+          setDialog('Enemy defeated! You win!');
+          disableActions();
+        }
+      });
+    } else if (char.role === 'attacker' && action === 'Special Attack') {
+      // Just a placeholder special
+      enemyHp -= 50;
+      if (enemyHp < 0) enemyHp = 0;
+      setDialog(`${char.name} used Special Attack! Enemy HP: ${enemyHp}`);
+      updateEnemyHpBar();
+      if (enemyHp <= 0) {
+        setDialog('Enemy defeated! You win!');
+        disableActions();
+      }
+    } else if (char.role === 'support') {
+      if (action === 'Heal') {
+        char.hp += 30;
+        if (char.hp > char.maxHp) char.hp = char.maxHp;
+        setDialog(`${char.name} healed themselves! HP: ${char.hp}`);
+        renderPartyMenu();
+      } else if (action === 'Buff') {
+        setDialog(`${char.name} buffs Pomgrante! (Effect placeholder)`);
+      }
+    } else if (char.role === 'mercy' && action === 'Ask for Mercy') {
+      setDialog(`${char.name} asks for mercy... but it's not working.`);
+    }
+  }
+
+  // Update enemy HP bar visually (optional)
+  function updateEnemyHpBar() {
+    // You could add a visible enemy HP bar here later
+  }
+
+  // Disable all action buttons on win
+  function disableActions() {
+    const buttons = document.querySelectorAll('.action-button');
+    buttons.forEach(b => b.disabled = true);
+  }
+
+  // Initial render
+  renderPartyMenu();
+  renderActionMenu();
+
+</script>
+
 </body>
 </html>
