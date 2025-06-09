@@ -3,16 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Deltarune-Style Battle UI Prototype</title>
+<title>Deltarune-Style Turn-Based Battle UI with Mini-Game</title>
 
-<!-- Pixel font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
 
 <style>
-  /* Reset */
-  * {
-    box-sizing: border-box;
-  }
   body {
     margin: 0; padding: 0;
     background: #000;
@@ -21,30 +16,26 @@
     user-select: none;
   }
 
-  /* Main container */
   #battle-container {
     max-width: 720px;
     margin: 20px auto;
     border: 4px solid #fff;
     background: #111;
     box-shadow: 0 0 0 4px #6600cc;
-    position: relative;
     padding: 12px;
   }
 
-  /* Battle area */
   #battle-area {
     background: #222;
     border: 2px solid #fff;
     height: 200px;
-    position: relative;
     margin-bottom: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
   }
 
-  /* Placeholder enemy sprite */
   #enemy-sprite {
     width: 96px;
     height: 96px;
@@ -54,7 +45,6 @@
     filter: drop-shadow(1px 1px 0 #6600cc);
   }
 
-  /* Party menu */
   #party-menu {
     display: flex;
     gap: 12px;
@@ -67,12 +57,11 @@
     padding: 6px;
     width: 160px;
     box-shadow: 2px 2px 0 #6600cc;
-    cursor: pointer;
-    transition: background 0.3s;
+    opacity: 0.4;
   }
 
-  .party-member.selected {
-    background: #6600cc;
+  .party-member.current {
+    opacity: 1;
   }
 
   .party-member img {
@@ -102,7 +91,6 @@
     width: 100%;
   }
 
-  /* Action menu */
   #action-menu {
     border: 3px solid #fff;
     background: #000;
@@ -119,13 +107,11 @@
     cursor: pointer;
     font-size: 12px;
     color: #fff;
-    transition: background 0.2s;
     user-select: none;
   }
 
-  .action-button:hover {
+  .action-button:hover:not(.disabled) {
     background: #6600cc;
-    color: #fff;
   }
 
   .action-button.disabled {
@@ -133,7 +119,6 @@
     cursor: default;
   }
 
-  /* Dialog box */
   #dialog-box {
     border: 4px solid #fff;
     background: #111;
@@ -142,6 +127,27 @@
     font-size: 14px;
     min-height: 40px;
     box-shadow: 0 0 0 4px #6600cc inset;
+  }
+
+  #controls {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  button#back-btn, button#launch-btn {
+    background: #111;
+    border: 2px solid #fff;
+    padding: 8px 12px;
+    font-family: 'Press Start 2P', cursive;
+    cursor: pointer;
+    color: #fff;
+    user-select: none;
+  }
+
+  button#back-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
 </style>
 </head>
@@ -154,21 +160,24 @@
   </div>
 
   <div id="party-menu">
-    <!-- Party members injected by JS -->
+    <!-- Party members shown with current highlighted -->
   </div>
 
   <div id="action-menu">
-    <!-- Action buttons injected by JS -->
+    <!-- Actions -->
   </div>
 
-  <div id="dialog-box">
-    Select an action to start the battle.
+  <div id="dialog-box">Battle start! Pomgrante's turn.</div>
+
+  <div id="controls">
+    <button id="back-btn" disabled>Back</button>
+    <button id="launch-btn" style="display:none;">Launch Attack</button>
   </div>
 
 </div>
 
 <script>
-  // Characters with their data and moves
+  // Characters and their data
   const party = [
     {
       name: 'Pomgrante',
@@ -199,34 +208,29 @@
   let currentCharIndex = 0;
   let enemyHp = 200;
   let dialogBox = document.getElementById('dialog-box');
+  let backBtn = document.getElementById('back-btn');
+  let launchBtn = document.getElementById('launch-btn');
+
+  let selectedActions = new Array(party.length).fill(null);
 
   const partyMenuDiv = document.getElementById('party-menu');
   const actionMenuDiv = document.getElementById('action-menu');
-  const battleArea = document.getElementById('battle-area');
 
-  // Render party UI
   function renderPartyMenu() {
     partyMenuDiv.innerHTML = '';
     party.forEach((char, i) => {
       const memberDiv = document.createElement('div');
       memberDiv.classList.add('party-member');
-      if (i === currentCharIndex) memberDiv.classList.add('selected');
+      if (i === currentCharIndex) memberDiv.classList.add('current');
       memberDiv.innerHTML = `
         <img src="${char.img}" alt="${char.name}">
         <div class="name">${char.name}</div>
         <div class="hp-bar"><div class="hp-fill" style="width:${(char.hp / char.maxHp) * 100}%;"></div></div>
       `;
-      memberDiv.addEventListener('click', () => {
-        currentCharIndex = i;
-        renderPartyMenu();
-        renderActionMenu();
-        setDialog(`You switched to ${char.name}.`);
-      });
       partyMenuDiv.appendChild(memberDiv);
     });
   }
 
-  // Render action menu based on selected character
   function renderActionMenu() {
     actionMenuDiv.innerHTML = '';
     const char = party[currentCharIndex];
@@ -235,7 +239,7 @@
       btn.classList.add('action-button');
       btn.textContent = move;
 
-      // Disable unsupported moves for Burger Shirt except Ask for Mercy
+      // Disable unsupported moves for Burger Shirt except "Ask for Mercy"
       if (char.role === 'mercy' && move !== 'Ask for Mercy') {
         btn.classList.add('disabled');
         btn.disabled = true;
@@ -243,100 +247,97 @@
 
       btn.addEventListener('click', () => {
         if (btn.disabled) return;
-        handleAction(move);
+        selectAction(move);
       });
 
       actionMenuDiv.appendChild(btn);
     });
   }
 
-  // Display dialog text
+  function selectAction(action) {
+    selectedActions[currentCharIndex] = action;
+    setDialog(`${party[currentCharIndex].name} chose "${action}".`);
+
+    // Move to next character if any left
+    if (currentCharIndex < party.length -1) {
+      currentCharIndex++;
+      renderPartyMenu();
+      renderActionMenu();
+      updateBackBtn();
+      setDialog(`It's ${party[currentCharIndex].name}'s turn.`);
+    } else {
+      // All chosen, show launch attack button
+      actionMenuDiv.innerHTML = '';
+      backBtn.disabled = false;
+      launchBtn.style.display = 'inline-block';
+      setDialog('All actions selected! Ready to launch attack.');
+    }
+  }
+
+  function updateBackBtn() {
+    backBtn.disabled = currentCharIndex === 0; // disable on Pomgrante
+  }
+
+  backBtn.addEventListener('click', () => {
+    if (currentCharIndex > 0) {
+      selectedActions[currentCharIndex] = null;
+      currentCharIndex--;
+      renderPartyMenu();
+      renderActionMenu();
+      updateBackBtn();
+      launchBtn.style.display = 'none';
+      setDialog(`Back to ${party[currentCharIndex].name}'s turn.`);
+    }
+  });
+
+  launchBtn.addEventListener('click', () => {
+    launchBtn.style.display = 'none';
+    backBtn.disabled = true;
+    startPomgranteMiniGame();
+  });
+
+  // Mini-game for Pomgrante attack: shoot cans aka shooting Layla
+  function startPomgranteMiniGame() {
+    setDialog('Pomgrante\'s mini-game! Press SPACE to shoot cans (each hit deals 15-20 dmg). You have 10 shots.');
+
+    let shotsLeft = 10;
+    let hits = 0;
+
+    function onKeyDown(e) {
+      if (e.code === 'Space' && shotsLeft > 0) {
+        shotsLeft--;
+        // Random damage per hit 15-20
+        let dmg = 15 + Math.floor(Math.random() * 6);
+        hits += dmg;
+        setDialog(`Hit! Damage: ${dmg}. Shots left: ${shotsLeft}`);
+      }
+      if (shotsLeft === 0) {
+        document.removeEventListener('keydown', onKeyDown);
+        enemyHp -= hits;
+        if (enemyHp < 0) enemyHp = 0;
+        setDialog(`Mini-game over! Total damage dealt: ${hits}. Enemy HP: ${enemyHp}`);
+        // After mini-game you can add enemy turn or next steps
+        if (enemyHp === 0) {
+          setDialog('Enemy defeated! You win!');
+        } else {
+          setTimeout(() => {
+            setDialog('Battle continues... (Implement enemy turn here)');
+          }, 3000);
+        }
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+  }
+
   function setDialog(text) {
     dialogBox.textContent = text;
-  }
-
-  // Mini-attack game placeholder (for Pomgrante's attack)
-  function miniAttackGame(callback) {
-    setDialog('Mini-game started! Press space quickly to attack!');
-    // Simple timed mini-game simulation:
-    let hits = 0;
-    let maxHits = 5;
-    function hit() {
-      hits++;
-      setDialog(`Hits: ${hits}/${maxHits}`);
-      if (hits >= maxHits) {
-        document.removeEventListener('keydown', onKeydown);
-        callback(hits);
-      }
-    }
-    function onKeydown(e) {
-      if (e.code === 'Space') {
-        hit();
-      }
-    }
-    document.addEventListener('keydown', onKeydown);
-
-    // Timeout in 5 seconds if user is slow
-    setTimeout(() => {
-      document.removeEventListener('keydown', onKeydown);
-      setDialog(`Mini-game ended with ${hits} hits.`);
-      callback(hits);
-    }, 5000);
-  }
-
-  // Handle chosen action
-  function handleAction(action) {
-    const char = party[currentCharIndex];
-    if (char.role === 'attacker' && action === 'Attack') {
-      miniAttackGame((hits) => {
-        let damage = hits * 10;
-        enemyHp -= damage;
-        if (enemyHp < 0) enemyHp = 0;
-        setDialog(`${char.name} did ${damage} damage! Enemy HP: ${enemyHp}`);
-        updateEnemyHpBar();
-        if (enemyHp <= 0) {
-          setDialog('Enemy defeated! You win!');
-          disableActions();
-        }
-      });
-    } else if (char.role === 'attacker' && action === 'Special Attack') {
-      // Just a placeholder special
-      enemyHp -= 50;
-      if (enemyHp < 0) enemyHp = 0;
-      setDialog(`${char.name} used Special Attack! Enemy HP: ${enemyHp}`);
-      updateEnemyHpBar();
-      if (enemyHp <= 0) {
-        setDialog('Enemy defeated! You win!');
-        disableActions();
-      }
-    } else if (char.role === 'support') {
-      if (action === 'Heal') {
-        char.hp += 30;
-        if (char.hp > char.maxHp) char.hp = char.maxHp;
-        setDialog(`${char.name} healed themselves! HP: ${char.hp}`);
-        renderPartyMenu();
-      } else if (action === 'Buff') {
-        setDialog(`${char.name} buffs Pomgrante! (Effect placeholder)`);
-      }
-    } else if (char.role === 'mercy' && action === 'Ask for Mercy') {
-      setDialog(`${char.name} asks for mercy... but it's not working.`);
-    }
-  }
-
-  // Update enemy HP bar visually (optional)
-  function updateEnemyHpBar() {
-    // You could add a visible enemy HP bar here later
-  }
-
-  // Disable all action buttons on win
-  function disableActions() {
-    const buttons = document.querySelectorAll('.action-button');
-    buttons.forEach(b => b.disabled = true);
   }
 
   // Initial render
   renderPartyMenu();
   renderActionMenu();
+  updateBackBtn();
 
 </script>
 
