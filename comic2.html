@@ -514,3 +514,93 @@
     confirmBtn.style.display = 'none';
     actionMenuDiv.style.display = 'none';
     let damage =
+      function talkOptions() {
+  const talkTexts = [
+    "Pomgrante: Hey Layla, wanna talk it out?",
+    "Pomgrante: I once ate a whole cake... no regrets.",
+    "Pomgrante: You look like you could use a hug."
+  ];
+  let selected = 0;
+
+  const talkBox = document.createElement("div");
+  talkBox.id = "talkBox";
+  talkBox.style.position = "absolute";
+  talkBox.style.bottom = "20px";
+  talkBox.style.left = "50%";
+  talkBox.style.transform = "translateX(-50%)";
+  talkBox.style.backgroundColor = "#222";
+  talkBox.style.color = "white";
+  talkBox.style.padding = "15px";
+  talkBox.style.border = "2px solid #555";
+  talkBox.style.fontFamily = "'Press Start 2P', cursive";
+  talkBox.style.width = "300px";
+  talkBox.style.textAlign = "center";
+
+  const optionText = document.createElement("p");
+  optionText.textContent = talkTexts[selected];
+  talkBox.appendChild(optionText);
+
+  // Navigation buttons
+  const btnPrev = document.createElement("button");
+  btnPrev.textContent = "Previous";
+  btnPrev.onclick = () => {
+    selected = (selected - 1 + talkTexts.length) % talkTexts.length;
+    optionText.textContent = talkTexts[selected];
+  };
+
+  const btnNext = document.createElement("button");
+  btnNext.textContent = "Next";
+  btnNext.onclick = () => {
+    selected = (selected + 1) % talkTexts.length;
+    optionText.textContent = talkTexts[selected];
+  };
+
+  const btnConfirm = document.createElement("button");
+  btnConfirm.textContent = "Confirm";
+  btnConfirm.onclick = () => {
+    document.body.removeChild(talkBox);
+    // After confirm, enemy "laughs" or reacts, then enemy turn
+    showEnemyReact(() => enemyTurn());
+  };
+
+  const btnCancel = document.createElement("button");
+  btnCancel.textContent = "Cancel";
+  btnCancel.onclick = () => {
+    document.body.removeChild(talkBox);
+    // Go back to player action selection
+    playerActionMenu();
+  };
+
+  // Append buttons
+  [btnPrev, btnNext, btnConfirm, btnCancel].forEach(btn => {
+    btn.style.margin = "5px";
+    talkBox.appendChild(btn);
+  });
+
+  document.body.appendChild(talkBox);
+}
+
+// Simple enemy reaction function after talk confirm
+function showEnemyReact(callback) {
+  const reactBox = document.createElement("div");
+  reactBox.id = "reactBox";
+  reactBox.style.position = "absolute";
+  reactBox.style.top = "20px";
+  reactBox.style.left = "50%";
+  reactBox.style.transform = "translateX(-50%)";
+  reactBox.style.backgroundColor = "#550000";
+  reactBox.style.color = "white";
+  reactBox.style.padding = "20px";
+  reactBox.style.border = "2px solid #aa0000";
+  reactBox.style.fontFamily = "'Press Start 2P', cursive";
+  reactBox.style.textAlign = "center";
+  reactBox.style.zIndex = "1000";
+  reactBox.textContent = "Layla laughs at your talk...";
+
+  document.body.appendChild(reactBox);
+
+  setTimeout(() => {
+    document.body.removeChild(reactBox);
+    callback();
+  }, 2000);
+}
