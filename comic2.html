@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Comic 2 - Game Panel</title>
+  <title>Comic 2 - Battle Game</title>
 
   <!-- XP.css for styling -->
   <link rel="stylesheet" href="https://unpkg.com/xp.css" />
@@ -11,161 +11,368 @@
     body {
       background-color: #0033cc;
       color: white;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .comic-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-top: 20px;
-      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin: 20px 0 10px 0;
+      color: #fff;
+      text-align: center;
+    }
+
+    #game-container {
+      background: #f0f0f0;
+      border: 4px solid #2e4f8f;
+      border-radius: 8px;
+      width: 800px;
+      height: 450px;
+      position: relative;
+      color: #2e4f8f;
       padding: 10px;
       box-sizing: border-box;
-    }
-
-    .panel {
-      width: 95%;
-      max-width: 800px;
-      background-color: #f0f0f0;
-      border: 2px solid #2e4f8f;
-      margin: 10px 0;
-      padding: 15px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      display: none;
-      min-height: 450px; /* space for game */
       display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* For the game container */
-    #game-container {
-      width: 100%;
-      height: 400px;
-      background: black;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 18px;
+      flex-direction: column;
+      justify-content: space-between;
       user-select: none;
     }
 
-    /* Navigation styles */
-    .navigation {
-      margin-top: 20px;
-      text-align: center;
+    #battlefield {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-grow: 1;
+      margin-bottom: 10px;
     }
 
-    .nav-button {
-      background-color: transparent;
-      color: #2e4f8f;
-      padding: 10px 20px;
-      margin: 0 10px;
-      text-decoration: none;
+    .character {
+      width: 120px;
+      height: 180px;
+      background-color: #cce;
       border: 2px solid #2e4f8f;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s, color 0.3s;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 5px;
+      box-sizing: border-box;
+      position: relative;
     }
 
-    .nav-button:hover {
+    .char-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .char-image {
+      flex-grow: 1;
+      width: 100%;
+      background-color: #99b;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 48px;
+      color: #446;
+      user-select: none;
+    }
+
+    .hp-bar {
+      width: 100%;
+      height: 15px;
+      background: #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+
+    .hp-fill {
+      height: 100%;
+      background-color: #4caf50;
+      width: 100%;
+      transition: width 0.3s ease;
+    }
+
+    #log {
+      height: 100px;
+      background: #e5e5ff;
+      border: 2px solid #2e4f8f;
+      border-radius: 6px;
+      color: #2e4f8f;
+      overflow-y: auto;
+      padding: 8px;
+      font-size: 14px;
+      font-family: monospace;
+      user-select: text;
+    }
+
+    #actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button.action-btn {
       background-color: #2e4f8f;
+      border: none;
       color: white;
+      padding: 10px 15px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      user-select: none;
     }
 
-    .nav-button:disabled {
-      color: #888;
-      border-color: #888;
+    button.action-btn:hover:not(:disabled) {
+      background-color: #1b2d58;
+    }
+
+    button.action-btn:disabled {
+      background-color: #999;
       cursor: not-allowed;
     }
 
-    #progress {
-      text-align: center;
-      margin-top: 10px;
-      color: white;
+    #nextPageBtn {
+      margin-top: 15px;
+      display: none;
+      background-color: #800080;
     }
   </style>
 </head>
-
 <body>
-  <div class="comic-container" id="comicContainer">
-    <!-- Panels injected here -->
-  </div>
 
-  <p id="progress"></p>
+  <h1>Battle vs Layla</h1>
+  
+  <div id="game-container">
+    <div id="battlefield">
+      <div class="character" id="char-pomgrante">
+        <div class="char-name">Pomgrante</div>
+        <div class="char-image">🍎</div>
+        <div class="hp-bar"><div class="hp-fill" id="hp-pomgrante"></div></div>
+        <div>HP: <span id="hp-text-pomgrante">100</span>/100</div>
+      </div>
+      <div class="character" id="char-potota">
+        <div class="char-name">Potota</div>
+        <div class="char-image">🥔</div>
+        <div class="hp-bar"><div class="hp-fill" id="hp-potota"></div></div>
+        <div>HP: <span id="hp-text-potota">160</span>/160</div>
+      </div>
+      <div class="character" id="char-burgershirt">
+        <div class="char-name">Burger Shirt</div>
+        <div class="char-image">🍔</div>
+        <div class="hp-bar"><div class="hp-fill" id="hp-burgershirt"></div></div>
+        <div>HP: <span id="hp-text-burgershirt">120</span>/120</div>
+      </div>
+      <div class="character" id="char-layla">
+        <div class="char-name">Layla (Enemy)</div>
+        <div class="char-image">👹</div>
+        <div class="hp-bar"><div class="hp-fill" id="hp-layla"></div></div>
+        <div>HP: <span id="hp-text-layla">200</span>/200</div>
+      </div>
+    </div>
 
-  <div class="navigation">
-    <button class="nav-button" id="prevButton" onclick="navigate(-1)" disabled>Previous</button>
-    <button class="nav-button" id="nextButton" onclick="navigate(1)">Next</button>
-    <button class="nav-button" onclick="window.location.href='index.html'">Home</button>
-    <button class="nav-button" onclick="window.location.href='comic1.html'">Comic 1</button>
+    <div id="log"></div>
+
+    <div id="actions">
+      <button class="action-btn" id="attackBtn">Attack</button>
+      <button class="action-btn" id="defendBtn">Defend</button>
+      <button class="action-btn" id="specialBtn">Special</button>
+    </div>
+
+    <button class="action-btn" id="nextPageBtn">Next Page</button>
   </div>
 
   <script>
-    // Comic 2 Panels: only panel 1 has a game, others empty
-    const comicPanels = [
-      {
-        // Panel 1 with embedded game container
-        content: `
-          <div id="game-container">
-            <!-- Simple placeholder game or your game iframe can go here -->
-            <p>Simple Game Placeholder: Press Space to jump! (Imagine a game here)</p>
-          </div>
-        `,
-      },
-      { content: "" },
-      { content: "" },
-      { content: "" },
-      { content: "" },
-      { content: "" },
-      { content: "" },
-      { content: "" },
-      { content: "" },
-      { content: "" }
-      // Add as many panels as you want, empty for now
-    ];
+    // Game state
+    const characters = {
+      pomgrante: { name: "Pomgrante", maxHp: 100, hp: 100, dmg: 20, defending: false },
+      potota: { name: "Potota", maxHp: 160, hp: 160, dmg: 10, defending: false },
+      burgershirt: { name: "Burger Shirt", maxHp: 120, hp: 120, dmg: 15, defending: false },
+      layla: { name: "Layla", maxHp: 200, hp: 200, dmg: 25, defending: false }
+    };
 
-    let currentPanel = 0;
+    const logEl = document.getElementById('log');
+    const attackBtn = document.getElementById('attackBtn');
+    const defendBtn = document.getElementById('defendBtn');
+    const specialBtn = document.getElementById('specialBtn');
+    const nextPageBtn = document.getElementById('nextPageBtn');
 
-    function loadComic() {
-      const container = document.getElementById("comicContainer");
-      comicPanels.forEach((panel, index) => {
-        const div = document.createElement("div");
-        div.className = "panel";
-        div.style.display = index === 0 ? "flex" : "none";
-        div.innerHTML = panel.content;
-        container.appendChild(div);
-      });
-      updateProgress();
+    let playerTurn = 0; // 0: Pomgrante, 1: Potota, 2: Burger Shirt, 3: Layla
+
+    function updateHpUI(charKey) {
+      const char = characters[charKey];
+      const hpFill = document.getElementById(`hp-${charKey}`);
+      const hpText = document.getElementById(`hp-text-${charKey}`);
+
+      const hpPercent = (char.hp / char.maxHp) * 100;
+      hpFill.style.width = `${hpPercent}%`;
+      hpText.textContent = char.hp;
+
+      // Change bar color if low HP
+      hpFill.style.backgroundColor = hpPercent > 50 ? '#4caf50' : hpPercent > 20 ? '#ff9800' : '#f44336';
     }
 
-    function navigate(direction) {
-      const panels = document.querySelectorAll(".panel");
-      const newIndex = currentPanel + direction;
-      if (newIndex >= 0 && newIndex < panels.length) {
-        panels[currentPanel].style.display = "none";
-        currentPanel = newIndex;
-        panels[currentPanel].style.display = "flex";
-        document.getElementById("prevButton").disabled = currentPanel === 0;
-        document.getElementById("nextButton").disabled = currentPanel === panels.length - 1;
-        updateProgress();
+    function log(message) {
+      logEl.innerHTML += message + "<br>";
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function disableActions(disabled) {
+      attackBtn.disabled = disabled;
+      defendBtn.disabled = disabled;
+      specialBtn.disabled = disabled;
+    }
+
+    function nextTurn() {
+      // Check if game over
+      if (characters.layla.hp <= 0) {
+        log("<b>Layla has been defeated! You win!</b>");
+        endGame(true);
+        return;
+      }
+      if (characters.pomgrante.hp <= 0 && characters.potota.hp <= 0 && characters.burgershirt.hp <= 0) {
+        log("<b>All heroes have fallen... You lose.</b>");
+        endGame(false);
+        return;
+      }
+
+      playerTurn = (playerTurn + 1) % 4;
+
+      if (playerTurn === 3) {
+        // Enemy turn
+        disableActions(true);
+        setTimeout(enemyAction, 1000);
+      } else {
+        disableActions(false);
+        log(`<i>${charactersTurnName()} turn. Choose an action.</i>`);
       }
     }
 
-    function updateProgress() {
-      document.getElementById("progress").textContent = `Page ${currentPanel + 1} of ${comicPanels.length}`;
+    function charactersTurnName() {
+      if (playerTurn === 0) return "Pomgrante";
+      if (playerTurn === 1) return "Potota";
+      if (playerTurn === 2) return "Burger Shirt";
+      return "Layla";
     }
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowRight") navigate(1);
-      if (e.key === "ArrowLeft") navigate(-1);
-    });
+    // Player actions:
+    attackBtn.onclick = () => {
+      playerAttack();
+    };
+    defendBtn.onclick = () => {
+      playerDefend();
+    };
+    specialBtn.onclick = () => {
+      playerSpecial();
+    };
 
-    document.addEventListener("DOMContentLoaded", loadComic);
+    function playerAttack() {
+      const attackerKey = getPlayerKey(playerTurn);
+      const attacker = characters[attackerKey];
+      let damage = attacker.dmg;
+
+      if (characters.layla.defending) {
+        damage = Math.floor(damage / 2);
+      }
+
+      characters.layla.hp = Math.max(0, characters.layla.hp - damage);
+      log(`${attacker.name} attacks Layla for ${damage} damage!`);
+
+      characters.layla.defending = false;
+      updateHpUI('layla');
+      nextTurn();
+    }
+
+    function playerDefend() {
+      const defenderKey = getPlayerKey(playerTurn);
+      characters[defenderKey].defending = true;
+      log(`${characters[defenderKey].name} is defending and will take half damage next attack.`);
+      nextTurn();
+    }
+
+    function playerSpecial() {
+      const attackerKey = getPlayerKey(playerTurn);
+      const attacker = characters[attackerKey];
+      const damage = attacker.dmg * 2;
+
+      if (characters.layla.defending) {
+        damage = Math.floor(damage / 2);
+      }
+
+      characters.layla.hp = Math.max(0, characters.layla.hp - damage);
+      log(`${attacker.name} uses a special attack on Layla for ${damage} damage!`);
+
+      characters.layla.defending = false;
+      updateHpUI('layla');
+      nextTurn();
+    }
+
+    // Enemy AI:
+    function enemyAction() {
+      if (characters.layla.hp <= 0) {
+        nextTurn();
+        return;
+      }
+
+      // Randomly attack one of the heroes who are alive
+      const heroesKeys = ['pomgrante', 'potota', 'burgershirt'].filter(key => characters[key].hp > 0);
+      const targetKey = heroesKeys[Math.floor(Math.random() * heroesKeys.length)];
+      const target = characters[targetKey];
+      let damage = characters.layla.dmg;
+
+      if (target.defending) {
+        damage = Math.floor(damage / 2);
+      }
+
+      target.hp = Math.max(0, target.hp - damage);
+      log(`Layla attacks ${target.name} for ${damage} damage!`);
+
+      target.defending = false;
+      updateHpUI(targetKey);
+
+      setTimeout(() => {
+        nextTurn();
+      }, 1000);
+    }
+
+    function getPlayerKey(turn) {
+      switch (turn) {
+        case 0: return 'pomgrante';
+        case 1: return 'potota';
+        case 2: return 'burgershirt';
+        default: return null;
+      }
+    }
+
+    function endGame(won) {
+      disableActions(true);
+      if (won) {
+        log("<b>Victory! You can proceed to the next page.</b>");
+        nextPageBtn.style.display = 'inline-block';
+      } else {
+        log("<b>Defeat... Try again later.</b>");
+      }
+    }
+
+    nextPageBtn.onclick = () => {
+      window.location.href = "comic3.html";  // Change to your actual next comic page
+    };
+
+    // Initialize HP bars on load
+    function init() {
+      Object.keys(characters).forEach(key => updateHpUI(key));
+      log("<i>Pomgrante's turn. Choose an action.</i>");
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
