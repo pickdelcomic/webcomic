@@ -3,345 +3,131 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Deltarune-Style Turn-Based Battle UI with Mini-Game</title>
-
+<title>Deltarune-Style Battle v2</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-
 <style>
   body {
-    margin: 0; padding: 0;
     background: #000;
-    font-family: 'Press Start 2P', cursive;
     color: #fff;
-    user-select: none;
+    font-family: 'Press Start 2P', monospace;
+    margin: 0;
+    padding: 0;
   }
-
   #battle-container {
     max-width: 720px;
-    margin: 20px auto;
-    border: 4px solid #fff;
+    margin: 0 auto;
+    padding: 12px;
+    border: 4px solid white;
     background: #111;
     box-shadow: 0 0 0 4px #6600cc;
-    padding: 12px;
   }
-
   #battle-area {
-    background: #222;
-    border: 2px solid #fff;
     height: 200px;
-    margin-bottom: 12px;
+    background: #222;
+    border: 2px solid white;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
+    margin-bottom: 12px;
   }
-
   #enemy-sprite {
     width: 96px;
     height: 96px;
-    image-rendering: pixelated;
-    background: url('https://i.imgur.com/jGXmnYI.png') center center no-repeat;
+    background: url('https://i.imgur.com/jGXmnYI.png') no-repeat center center;
     background-size: contain;
-    filter: drop-shadow(1px 1px 0 #6600cc);
+    image-rendering: pixelated;
   }
-
   #party-menu {
     display: flex;
-    gap: 12px;
+    justify-content: space-between;
     margin-bottom: 12px;
   }
-
   .party-member {
-    border: 3px solid #fff;
-    background: #000;
-    padding: 6px;
-    width: 160px;
-    box-shadow: 2px 2px 0 #6600cc;
+    width: 30%;
+    border: 3px solid white;
+    padding: 8px;
+    background: black;
     opacity: 0.4;
   }
-
   .party-member.current {
     opacity: 1;
   }
-
   .party-member img {
     width: 64px;
     height: 64px;
-    image-rendering: pixelated;
     display: block;
-    margin-bottom: 6px;
+    margin: 0 auto 6px;
   }
-
-  .party-member .name {
-    font-size: 14px;
-    text-align: center;
-  }
-
-  .party-member .hp-bar {
+  .hp-bar {
     background: #330044;
     height: 10px;
+    border: 1px solid white;
     margin-top: 6px;
-    position: relative;
-    border: 1px solid #fff;
   }
-
-  .party-member .hp-fill {
+  .hp-fill {
     background: #00ff88;
     height: 100%;
     width: 100%;
   }
-
-  #action-menu {
-    border: 3px solid #fff;
-    background: #000;
-    padding: 8px;
-    box-shadow: 2px 2px 0 #6600cc;
+  #action-menu, #talk-options {
     display: flex;
-    justify-content: space-around;
+    gap: 8px;
+    margin-bottom: 12px;
   }
-
-  .action-button {
+  .action-button, .talk-button {
     background: #111;
-    border: 2px solid #fff;
-    padding: 8px 12px;
+    border: 2px solid white;
+    padding: 6px 8px;
+    color: white;
     cursor: pointer;
     font-size: 12px;
-    color: #fff;
-    user-select: none;
   }
-
-  .action-button:hover:not(.disabled) {
+  .action-button:hover, .talk-button:hover {
     background: #6600cc;
   }
-
-  .action-button.disabled {
+  .disabled {
     opacity: 0.4;
-    cursor: default;
+    pointer-events: none;
   }
-
   #dialog-box {
-    border: 4px solid #fff;
-    background: #111;
-    margin-top: 12px;
+    border: 4px solid white;
     padding: 10px;
-    font-size: 14px;
-    min-height: 40px;
-    box-shadow: 0 0 0 4px #6600cc inset;
+    background: black;
+    min-height: 48px;
+    box-shadow: inset 0 0 0 4px #6600cc;
   }
-
   #controls {
-    margin-top: 12px;
+    margin-top: 8px;
     display: flex;
     justify-content: space-between;
   }
-
-  button#back-btn, button#launch-btn {
+  #launch-btn, #back-btn {
     background: #111;
-    border: 2px solid #fff;
-    padding: 8px 12px;
-    font-family: 'Press Start 2P', cursive;
+    border: 2px solid white;
+    color: white;
+    padding: 6px 12px;
+    font-family: 'Press Start 2P';
     cursor: pointer;
-    color: #fff;
-    user-select: none;
-  }
-
-  button#back-btn:disabled {
-    opacity: 0.4;
-    cursor: default;
   }
 </style>
 </head>
 <body>
-
 <div id="battle-container">
-
   <div id="battle-area">
     <div id="enemy-sprite"></div>
   </div>
-
-  <div id="party-menu">
-    <!-- Party members shown with current highlighted -->
-  </div>
-
-  <div id="action-menu">
-    <!-- Actions -->
-  </div>
-
-  <div id="dialog-box">Battle start! Pomgrante's turn.</div>
-
+  <div id="party-menu"></div>
+  <div id="action-menu"></div>
+  <div id="talk-options" style="display: none;"></div>
+  <div id="dialog-box">Pomgrante's turn!</div>
   <div id="controls">
     <button id="back-btn" disabled>Back</button>
     <button id="launch-btn" style="display:none;">Launch Attack</button>
   </div>
-
 </div>
-
 <script>
-  // Characters and their data
-  const party = [
-    {
-      name: 'Pomgrante',
-      hp: 100,
-      maxHp: 100,
-      img: 'https://i.imgur.com/3xwL56R.png',
-      role: 'attacker',
-      moves: ['Attack', 'Special Attack']
-    },
-    {
-      name: 'Potota',
-      hp: 120,
-      maxHp: 120,
-      img: 'https://i.imgur.com/d6EqIcM.png',
-      role: 'support',
-      moves: ['Heal', 'Buff']
-    },
-    {
-      name: 'Burger Shirt',
-      hp: 80,
-      maxHp: 80,
-      img: 'https://i.imgur.com/bwVYrML.png',
-      role: 'mercy',
-      moves: ['Ask for Mercy']
-    }
-  ];
-
-  let currentCharIndex = 0;
-  let enemyHp = 200;
-  let dialogBox = document.getElementById('dialog-box');
-  let backBtn = document.getElementById('back-btn');
-  let launchBtn = document.getElementById('launch-btn');
-
-  let selectedActions = new Array(party.length).fill(null);
-
-  const partyMenuDiv = document.getElementById('party-menu');
-  const actionMenuDiv = document.getElementById('action-menu');
-
-  function renderPartyMenu() {
-    partyMenuDiv.innerHTML = '';
-    party.forEach((char, i) => {
-      const memberDiv = document.createElement('div');
-      memberDiv.classList.add('party-member');
-      if (i === currentCharIndex) memberDiv.classList.add('current');
-      memberDiv.innerHTML = `
-        <img src="${char.img}" alt="${char.name}">
-        <div class="name">${char.name}</div>
-        <div class="hp-bar"><div class="hp-fill" style="width:${(char.hp / char.maxHp) * 100}%;"></div></div>
-      `;
-      partyMenuDiv.appendChild(memberDiv);
-    });
-  }
-
-  function renderActionMenu() {
-    actionMenuDiv.innerHTML = '';
-    const char = party[currentCharIndex];
-    char.moves.forEach(move => {
-      const btn = document.createElement('button');
-      btn.classList.add('action-button');
-      btn.textContent = move;
-
-      // Disable unsupported moves for Burger Shirt except "Ask for Mercy"
-      if (char.role === 'mercy' && move !== 'Ask for Mercy') {
-        btn.classList.add('disabled');
-        btn.disabled = true;
-      }
-
-      btn.addEventListener('click', () => {
-        if (btn.disabled) return;
-        selectAction(move);
-      });
-
-      actionMenuDiv.appendChild(btn);
-    });
-  }
-
-  function selectAction(action) {
-    selectedActions[currentCharIndex] = action;
-    setDialog(`${party[currentCharIndex].name} chose "${action}".`);
-
-    // Move to next character if any left
-    if (currentCharIndex < party.length -1) {
-      currentCharIndex++;
-      renderPartyMenu();
-      renderActionMenu();
-      updateBackBtn();
-      setDialog(`It's ${party[currentCharIndex].name}'s turn.`);
-    } else {
-      // All chosen, show launch attack button
-      actionMenuDiv.innerHTML = '';
-      backBtn.disabled = false;
-      launchBtn.style.display = 'inline-block';
-      setDialog('All actions selected! Ready to launch attack.');
-    }
-  }
-
-  function updateBackBtn() {
-    backBtn.disabled = currentCharIndex === 0; // disable on Pomgrante
-  }
-
-  backBtn.addEventListener('click', () => {
-    if (currentCharIndex > 0) {
-      selectedActions[currentCharIndex] = null;
-      currentCharIndex--;
-      renderPartyMenu();
-      renderActionMenu();
-      updateBackBtn();
-      launchBtn.style.display = 'none';
-      setDialog(`Back to ${party[currentCharIndex].name}'s turn.`);
-    }
-  });
-
-  launchBtn.addEventListener('click', () => {
-    launchBtn.style.display = 'none';
-    backBtn.disabled = true;
-    startPomgranteMiniGame();
-  });
-
-  // Mini-game for Pomgrante attack: shoot cans aka shooting Layla
-  function startPomgranteMiniGame() {
-    setDialog('Pomgrante\'s mini-game! Press SPACE to shoot cans (each hit deals 15-20 dmg). You have 10 shots.');
-
-    let shotsLeft = 10;
-    let hits = 0;
-
-    function onKeyDown(e) {
-      if (e.code === 'Space' && shotsLeft > 0) {
-        shotsLeft--;
-        // Random damage per hit 15-20
-        let dmg = 15 + Math.floor(Math.random() * 6);
-        hits += dmg;
-        setDialog(`Hit! Damage: ${dmg}. Shots left: ${shotsLeft}`);
-      }
-      if (shotsLeft === 0) {
-        document.removeEventListener('keydown', onKeyDown);
-        enemyHp -= hits;
-        if (enemyHp < 0) enemyHp = 0;
-        setDialog(`Mini-game over! Total damage dealt: ${hits}. Enemy HP: ${enemyHp}`);
-        // After mini-game you can add enemy turn or next steps
-        if (enemyHp === 0) {
-          setDialog('Enemy defeated! You win!');
-        } else {
-          setTimeout(() => {
-            setDialog('Battle continues... (Implement enemy turn here)');
-          }, 3000);
-        }
-      }
-    }
-
-    document.addEventListener('keydown', onKeyDown);
-  }
-
-  function setDialog(text) {
-    dialogBox.textContent = text;
-  }
-
-  // Initial render
-  renderPartyMenu();
-  renderActionMenu();
-  updateBackBtn();
-
+// Placeholder party setup and logic will be here.
 </script>
-
 </body>
 </html>
 
-setInterval(render, 100);
