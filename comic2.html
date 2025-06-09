@@ -1,260 +1,347 @@
-// === PART 1: Battle Setup ===
-const battleCanvas = document.createElement("canvas");
-battleCanvas.width = 600;
-battleCanvas.height = 300;
-battleCanvas.style.border = "2px solid white";
-battleCanvas.style.margin = "20px";
-battleCanvas.style.display = "none";
-document.body.insertBefore(battleCanvas, document.querySelector(".navigation"));
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Deltarune-Style Turn-Based Battle UI with Mini-Game</title>
 
-const ctx = battleCanvas.getContext("2d");
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
 
-let state = {
-  characters: [
-    { name: "Pomgrante", hp: 100, maxHp: 100, action: null },
-    { name: "Potota", hp: 160, maxHp: 160, action: null },
-    { name: "Burger Shirt", hp: 120, maxHp: 120, action: null }
-  ],
-  enemy: { name: "Layla", hp: 250, maxHp: 250 },
-  turnIndex: 0,
-  substate: "select", // select, options, confirm, attack, enemyTurn
-  selectedOption: 0,
-  attackConfirmed: false
-};
+<style>
+  body {
+    margin: 0; padding: 0;
+    background: #000;
+    font-family: 'Press Start 2P', cursive;
+    color: #fff;
+    user-select: none;
+  }
 
-const actions = {
-  Pomgrante: ["Gun", "Talk"],
-  Potota: ["Encourage", "Talk"],
-  "Burger Shirt": ["Mercy"]
-};
+  #battle-container {
+    max-width: 720px;
+    margin: 20px auto;
+    border: 4px solid #fff;
+    background: #111;
+    box-shadow: 0 0 0 4px #6600cc;
+    padding: 12px;
+  }
 
-const talkOptions = {
-  Pomgrante: ["What’s your deal?", "You’re kinda cool", "Sorry for shooting you"],
-  Potota: ["Want a hug?", "We come in peace", "You look weird"],
-  "Burger Shirt": ["Please go away", "Wanna collab?", "I believe in you"]
-};
+  #battle-area {
+    background: #222;
+    border: 2px solid #fff;
+    height: 200px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
 
-function drawUI() {
-  ctx.clearRect(0, 0, battleCanvas.width, battleCanvas.height);
+  #enemy-sprite {
+    width: 96px;
+    height: 96px;
+    image-rendering: pixelated;
+    background: url('https://i.imgur.com/jGXmnYI.png') center center no-repeat;
+    background-size: contain;
+    filter: drop-shadow(1px 1px 0 #6600cc);
+  }
 
-  // Draw characters
-  ctx.fillStyle = "white";
-  ctx.font = "16px monospace";
-  ctx.fillText("== YOUR TEAM ==", 10, 20);
+  #party-menu {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
 
-  state.characters.forEach((ch, i) => {
-    let y = 40 + i * 30;
-    ctx.fillStyle = state.turnIndex === i ? "yellow" : "white";
-    ctx.fillText(`${ch.name}: ${ch.hp}/${ch.maxHp}`, 10, y);
+  .party-member {
+    border: 3px solid #fff;
+    background: #000;
+    padding: 6px;
+    width: 160px;
+    box-shadow: 2px 2px 0 #6600cc;
+    opacity: 0.4;
+  }
+
+  .party-member.current {
+    opacity: 1;
+  }
+
+  .party-member img {
+    width: 64px;
+    height: 64px;
+    image-rendering: pixelated;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .party-member .name {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .party-member .hp-bar {
+    background: #330044;
+    height: 10px;
+    margin-top: 6px;
+    position: relative;
+    border: 1px solid #fff;
+  }
+
+  .party-member .hp-fill {
+    background: #00ff88;
+    height: 100%;
+    width: 100%;
+  }
+
+  #action-menu {
+    border: 3px solid #fff;
+    background: #000;
+    padding: 8px;
+    box-shadow: 2px 2px 0 #6600cc;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .action-button {
+    background: #111;
+    border: 2px solid #fff;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #fff;
+    user-select: none;
+  }
+
+  .action-button:hover:not(.disabled) {
+    background: #6600cc;
+  }
+
+  .action-button.disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  #dialog-box {
+    border: 4px solid #fff;
+    background: #111;
+    margin-top: 12px;
+    padding: 10px;
+    font-size: 14px;
+    min-height: 40px;
+    box-shadow: 0 0 0 4px #6600cc inset;
+  }
+
+  #controls {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  button#back-btn, button#launch-btn {
+    background: #111;
+    border: 2px solid #fff;
+    padding: 8px 12px;
+    font-family: 'Press Start 2P', cursive;
+    cursor: pointer;
+    color: #fff;
+    user-select: none;
+  }
+
+  button#back-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+</style>
+</head>
+<body>
+
+<div id="battle-container">
+
+  <div id="battle-area">
+    <div id="enemy-sprite"></div>
+  </div>
+
+  <div id="party-menu">
+    <!-- Party members shown with current highlighted -->
+  </div>
+
+  <div id="action-menu">
+    <!-- Actions -->
+  </div>
+
+  <div id="dialog-box">Battle start! Pomgrante's turn.</div>
+
+  <div id="controls">
+    <button id="back-btn" disabled>Back</button>
+    <button id="launch-btn" style="display:none;">Launch Attack</button>
+  </div>
+
+</div>
+
+<script>
+  // Characters and their data
+  const party = [
+    {
+      name: 'Pomgrante',
+      hp: 100,
+      maxHp: 100,
+      img: 'https://i.imgur.com/3xwL56R.png',
+      role: 'attacker',
+      moves: ['Attack', 'Special Attack']
+    },
+    {
+      name: 'Potota',
+      hp: 120,
+      maxHp: 120,
+      img: 'https://i.imgur.com/d6EqIcM.png',
+      role: 'support',
+      moves: ['Heal', 'Buff']
+    },
+    {
+      name: 'Burger Shirt',
+      hp: 80,
+      maxHp: 80,
+      img: 'https://i.imgur.com/bwVYrML.png',
+      role: 'mercy',
+      moves: ['Ask for Mercy']
+    }
+  ];
+
+  let currentCharIndex = 0;
+  let enemyHp = 200;
+  let dialogBox = document.getElementById('dialog-box');
+  let backBtn = document.getElementById('back-btn');
+  let launchBtn = document.getElementById('launch-btn');
+
+  let selectedActions = new Array(party.length).fill(null);
+
+  const partyMenuDiv = document.getElementById('party-menu');
+  const actionMenuDiv = document.getElementById('action-menu');
+
+  function renderPartyMenu() {
+    partyMenuDiv.innerHTML = '';
+    party.forEach((char, i) => {
+      const memberDiv = document.createElement('div');
+      memberDiv.classList.add('party-member');
+      if (i === currentCharIndex) memberDiv.classList.add('current');
+      memberDiv.innerHTML = `
+        <img src="${char.img}" alt="${char.name}">
+        <div class="name">${char.name}</div>
+        <div class="hp-bar"><div class="hp-fill" style="width:${(char.hp / char.maxHp) * 100}%;"></div></div>
+      `;
+      partyMenuDiv.appendChild(memberDiv);
+    });
+  }
+
+  function renderActionMenu() {
+    actionMenuDiv.innerHTML = '';
+    const char = party[currentCharIndex];
+    char.moves.forEach(move => {
+      const btn = document.createElement('button');
+      btn.classList.add('action-button');
+      btn.textContent = move;
+
+      // Disable unsupported moves for Burger Shirt except "Ask for Mercy"
+      if (char.role === 'mercy' && move !== 'Ask for Mercy') {
+        btn.classList.add('disabled');
+        btn.disabled = true;
+      }
+
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        selectAction(move);
+      });
+
+      actionMenuDiv.appendChild(btn);
+    });
+  }
+
+  function selectAction(action) {
+    selectedActions[currentCharIndex] = action;
+    setDialog(`${party[currentCharIndex].name} chose "${action}".`);
+
+    // Move to next character if any left
+    if (currentCharIndex < party.length -1) {
+      currentCharIndex++;
+      renderPartyMenu();
+      renderActionMenu();
+      updateBackBtn();
+      setDialog(`It's ${party[currentCharIndex].name}'s turn.`);
+    } else {
+      // All chosen, show launch attack button
+      actionMenuDiv.innerHTML = '';
+      backBtn.disabled = false;
+      launchBtn.style.display = 'inline-block';
+      setDialog('All actions selected! Ready to launch attack.');
+    }
+  }
+
+  function updateBackBtn() {
+    backBtn.disabled = currentCharIndex === 0; // disable on Pomgrante
+  }
+
+  backBtn.addEventListener('click', () => {
+    if (currentCharIndex > 0) {
+      selectedActions[currentCharIndex] = null;
+      currentCharIndex--;
+      renderPartyMenu();
+      renderActionMenu();
+      updateBackBtn();
+      launchBtn.style.display = 'none';
+      setDialog(`Back to ${party[currentCharIndex].name}'s turn.`);
+    }
   });
 
-  ctx.fillStyle = "red";
-  ctx.fillText(`ENEMY: ${state.enemy.name} ${state.enemy.hp}/${state.enemy.maxHp}`, 10, 150);
+  launchBtn.addEventListener('click', () => {
+    launchBtn.style.display = 'none';
+    backBtn.disabled = true;
+    startPomgranteMiniGame();
+  });
 
-  // Options UI
-  ctx.fillStyle = "white";
-  ctx.fillText("Select Action:", 10, 180);
+  // Mini-game for Pomgrante attack: shoot cans aka shooting Layla
+  function startPomgranteMiniGame() {
+    setDialog('Pomgrante\'s mini-game! Press SPACE to shoot cans (each hit deals 15-20 dmg). You have 10 shots.');
 
-  let currentChar = state.characters[state.turnIndex];
-  let opts = actions[currentChar.name];
-  if (state.substate === "options") {
-    opts.forEach((opt, i) => {
-      ctx.fillStyle = i === state.selectedOption ? "cyan" : "white";
-      ctx.fillText(opt, 30 + i * 100, 210);
-    });
-  }
+    let shotsLeft = 10;
+    let hits = 0;
 
-  if (state.substate === "talk") {
-    let talks = talkOptions[currentChar.name];
-    talks.forEach((line, i) => {
-      ctx.fillStyle = i === state.selectedOption ? "cyan" : "white";
-      ctx.fillText(line, 30, 210 + i * 20);
-    });
-  }
-
-  if (state.substate === "confirm") {
-    ctx.fillStyle = "cyan";
-    ctx.fillText("Press Z to launch attack!", 10, 270);
-  }
-
-  if (state.substate === "enemyTurn") {
-    ctx.fillStyle = "red";
-    ctx.fillText("ENEMY IS ATTACKING!", 10, 270);
-  }
-}
-// === PART 2: Controls & Input ===
-document.addEventListener("keydown", (e) => {
-  const currentChar = state.characters[state.turnIndex];
-
-  if (state.substate === "options") {
-    if (e.key === "ArrowRight") {
-      state.selectedOption = (state.selectedOption + 1) % actions[currentChar.name].length;
-    } else if (e.key === "ArrowLeft") {
-      state.selectedOption = (state.selectedOption - 1 + actions[currentChar.name].length) % actions[currentChar.name].length;
-    } else if (e.key === "z") {
-      const selectedAction = actions[currentChar.name][state.selectedOption];
-      if (selectedAction === "Talk") {
-        state.substate = "talk";
-        state.selectedOption = 0;
-      } else {
-        currentChar.action = selectedAction;
-        advanceTurn();
+    function onKeyDown(e) {
+      if (e.code === 'Space' && shotsLeft > 0) {
+        shotsLeft--;
+        // Random damage per hit 15-20
+        let dmg = 15 + Math.floor(Math.random() * 6);
+        hits += dmg;
+        setDialog(`Hit! Damage: ${dmg}. Shots left: ${shotsLeft}`);
+      }
+      if (shotsLeft === 0) {
+        document.removeEventListener('keydown', onKeyDown);
+        enemyHp -= hits;
+        if (enemyHp < 0) enemyHp = 0;
+        setDialog(`Mini-game over! Total damage dealt: ${hits}. Enemy HP: ${enemyHp}`);
+        // After mini-game you can add enemy turn or next steps
+        if (enemyHp === 0) {
+          setDialog('Enemy defeated! You win!');
+        } else {
+          setTimeout(() => {
+            setDialog('Battle continues... (Implement enemy turn here)');
+          }, 3000);
+        }
       }
     }
-  } else if (state.substate === "talk") {
-    const talks = talkOptions[currentChar.name];
-    if (e.key === "ArrowDown") {
-      state.selectedOption = (state.selectedOption + 1) % talks.length;
-    } else if (e.key === "ArrowUp") {
-      state.selectedOption = (state.selectedOption - 1 + talks.length) % talks.length;
-    } else if (e.key === "z") {
-      currentChar.action = `Talk: ${talks[state.selectedOption]}`;
-      advanceTurn();
-    } else if (e.key === "x") {
-      state.substate = "options";
-      state.selectedOption = 0;
-    }
-  } else if (state.substate === "confirm") {
-    if (e.key === "z") {
-      state.substate = "attack";
-      launchAttack();
-    }
-  }
-});
 
-function advanceTurn() {
-  state.turnIndex++;
-  state.selectedOption = 0;
-
-  if (state.turnIndex >= state.characters.length) {
-    state.substate = "confirm";
-    state.turnIndex = 0;
-  } else {
-    state.substate = "options";
-  }
-}
-// === PART 3: Minigame, Attack, Render ===
-
-function launchAttack() {
-  state.enemy.hp -= 0; // damage comes from minigame
-  startMinigame();
-}
-
-function startMinigame() {
-  const targets = [];
-  for (let i = 0; i < 5; i++) {
-    targets.push({
-      x: Math.random() * 240 + 50,
-      y: Math.random() * 80 + 40,
-      alive: true
-    });
-  }
-  state.minigame = { cursorX: 160, targets, timer: 100 };
-
-  const gameLoop = setInterval(() => {
-    const mg = state.minigame;
-    if (!mg) {
-      clearInterval(gameLoop);
-      return;
-    }
-    mg.timer--;
-
-    render();
-
-    if (mg.timer <= 0) {
-      const hits = mg.targets.filter(t => !t.alive).length;
-      const damage = hits * 20;
-      state.enemy.hp -= damage;
-      state.minigame = null;
-
-      setTimeout(() => {
-        enemyTurn();
-      }, 1000);
-
-      clearInterval(gameLoop);
-    }
-  }, 100);
-
-  document.addEventListener("keydown", minigameInput);
-}
-
-function minigameInput(e) {
-  const mg = state.minigame;
-  if (!mg) return;
-  if (e.key === "ArrowLeft") mg.cursorX -= 10;
-  if (e.key === "ArrowRight") mg.cursorX += 10;
-  if (e.key === "z") {
-    mg.targets.forEach(t => {
-      if (t.alive && Math.abs(t.x - mg.cursorX) < 20) t.alive = false;
-    });
-  }
-}
-
-function enemyTurn() {
-  const dmg = Math.floor(Math.random() * 20) + 30;
-  const target = state.characters[Math.floor(Math.random() * state.characters.length)];
-  target.hp = Math.max(0, target.hp - dmg);
-
-  setTimeout(() => {
-    state.turnIndex = 0;
-    state.characters.forEach(c => c.action = null);
-    state.substate = "options";
-    render();
-  }, 1000);
-}
-
-function render() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // UI Frame
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Enemy
-  ctx.fillStyle = "red";
-  ctx.font = "bold 20px sans-serif";
-  ctx.fillText(`LAYLA HP: ${state.enemy.hp}`, 150, 30);
-
-  // Characters
-  state.characters.forEach((char, i) => {
-    ctx.fillStyle = i === state.turnIndex && state.substate === "options" ? "yellow" : "white";
-    ctx.fillText(`${char.name}: ${char.hp} HP`, 10, 60 + i * 20);
-  });
-
-  // Substates
-  const currentChar = state.characters[state.turnIndex];
-  if (state.substate === "options") {
-    const opts = actions[currentChar.name];
-    opts.forEach((opt, i) => {
-      ctx.fillStyle = i === state.selectedOption ? "lime" : "white";
-      ctx.fillText(opt, 150 + i * 80, 100);
-    });
-  } else if (state.substate === "talk") {
-    const opts = talkOptions[currentChar.name];
-    opts.forEach((opt, i) => {
-      ctx.fillStyle = i === state.selectedOption ? "cyan" : "white";
-      ctx.fillText(opt, 10, 150 + i * 20);
-    });
-    ctx.fillStyle = "gray";
-    ctx.fillText("[X] Cancel", 10, 240);
-  } else if (state.substate === "confirm") {
-    ctx.fillStyle = "white";
-    ctx.fillText("Press Z to LAUNCH ATTACK!", 100, 200);
+    document.addEventListener('keydown', onKeyDown);
   }
 
-  // Minigame
-  if (state.minigame) {
-    ctx.fillStyle = "orange";
-    state.minigame.targets.forEach(t => {
-      if (t.alive) ctx.fillRect(t.x, t.y, 10, 10);
-    });
-
-    ctx.strokeStyle = "white";
-    ctx.beginPath();
-    ctx.moveTo(state.minigame.cursorX, 120);
-    ctx.lineTo(state.minigame.cursorX, 130);
-    ctx.stroke();
+  function setDialog(text) {
+    dialogBox.textContent = text;
   }
-}
+
+  // Initial render
+  renderPartyMenu();
+  renderActionMenu();
+  updateBackBtn();
+
+</script>
+
+</body>
+</html>
 
 setInterval(render, 100);
