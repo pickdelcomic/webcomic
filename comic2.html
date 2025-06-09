@@ -1,606 +1,260 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Deltarune Battle with Talk & Mini-game</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-<style>
-  body {
-    margin: 0; padding: 0;
-    background: #000;
-    font-family: 'Press Start 2P', cursive;
-    color: #fff;
-    user-select: none;
-  }
-  #battle-container {
-    max-width: 720px;
-    margin: 20px auto;
-    border: 4px solid #fff;
-    background: #111;
-    box-shadow: 0 0 0 4px #6600cc;
-    padding: 12px;
-    position: relative;
-  }
-  #battle-area {
-    background: #222;
-    border: 2px solid #fff;
-    height: 200px;
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-  }
-  #enemy-sprite {
-    width: 96px;
-    height: 96px;
-    image-rendering: pixelated;
-    background: url('https://i.imgur.com/jGXmnYI.png') center center no-repeat;
-    background-size: contain;
-    filter: drop-shadow(1px 1px 0 #6600cc);
-  }
-  #party-menu {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  .party-member {
-    border: 3px solid #fff;
-    background: #000;
-    padding: 6px;
-    width: 160px;
-    box-shadow: 2px 2px 0 #6600cc;
-    opacity: 0.4;
-    cursor: default;
-    position: relative;
-  }
-  .party-member.current {
-    opacity: 1;
-  }
-  .party-member.buff {
-    box-shadow: 2px 2px 10px #0f0;
-  }
-  .party-member img {
-    width: 64px;
-    height: 64px;
-    image-rendering: pixelated;
-    display: block;
-    margin-bottom: 6px;
-  }
-  .party-member .name {
-    font-size: 14px;
-    text-align: center;
-  }
-  .party-member .hp-bar {
-    background: #330044;
-    height: 10px;
-    margin-top: 6px;
-    position: relative;
-    border: 1px solid #fff;
-  }
-  .party-member .hp-fill {
-    background: #00ff88;
-    height: 100%;
-    width: 100%;
-  }
-  #action-menu {
-    border: 3px solid #fff;
-    background: #000;
-    padding: 8px;
-    box-shadow: 2px 2px 0 #6600cc;
-    display: flex;
-    justify-content: space-around;
-    min-height: 60px;
-  }
-  .action-button {
-    background: #111;
-    border: 2px solid #fff;
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 12px;
-    color: #fff;
-    user-select: none;
-  }
-  .action-button:hover:not(.disabled) {
-    background: #6600cc;
-  }
-  .action-button.disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-  #dialog-box {
-    border: 4px solid #fff;
-    background: #111;
-    margin-top: 12px;
-    padding: 10px;
-    font-size: 14px;
-    min-height: 40px;
-    box-shadow: 0 0 0 4px #6600cc inset;
-  }
-  #controls {
-    margin-top: 12px;
-    display: flex;
-    justify-content: space-between;
-  }
-  button#back-btn, button#confirm-btn {
-    background: #111;
-    border: 2px solid #fff;
-    padding: 8px 12px;
-    font-family: 'Press Start 2P', cursive;
-    cursor: pointer;
-    color: #fff;
-    user-select: none;
-  }
-  button#back-btn:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-  #mini-game-area {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.9);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-  }
-  .target {
-    width: 64px;
-    height: 64px;
-    background: url('https://i.imgur.com/3xwL56R.png') no-repeat center center;
-    background-size: contain;
-    image-rendering: pixelated;
-    cursor: crosshair;
-    position: relative;
-    display: none;
-  }
-  #aim-cursor {
-    position: absolute;
-    width: 32px;
-    height: 32px;
-    border: 2px solid #0f0;
-    border-radius: 50%;
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-  }
-</style>
-</head>
-<body>
+// === PART 1: Battle Setup ===
+const battleCanvas = document.createElement("canvas");
+battleCanvas.width = 600;
+battleCanvas.height = 300;
+battleCanvas.style.border = "2px solid white";
+battleCanvas.style.margin = "20px";
+battleCanvas.style.display = "none";
+document.body.insertBefore(battleCanvas, document.querySelector(".navigation"));
 
-<div id="battle-container">
+const ctx = battleCanvas.getContext("2d");
 
-  <div id="battle-area">
-    <div id="enemy-sprite"></div>
-  </div>
+let state = {
+  characters: [
+    { name: "Pomgrante", hp: 100, maxHp: 100, action: null },
+    { name: "Potota", hp: 160, maxHp: 160, action: null },
+    { name: "Burger Shirt", hp: 120, maxHp: 120, action: null }
+  ],
+  enemy: { name: "Layla", hp: 250, maxHp: 250 },
+  turnIndex: 0,
+  substate: "select", // select, options, confirm, attack, enemyTurn
+  selectedOption: 0,
+  attackConfirmed: false
+};
 
-  <div id="party-menu">
-    <!-- Party members shown with current highlighted -->
-  </div>
+const actions = {
+  Pomgrante: ["Gun", "Talk"],
+  Potota: ["Encourage", "Talk"],
+  "Burger Shirt": ["Mercy"]
+};
 
-  <div id="action-menu">
-    <!-- Actions -->
-  </div>
+const talkOptions = {
+  Pomgrante: ["What’s your deal?", "You’re kinda cool", "Sorry for shooting you"],
+  Potota: ["Want a hug?", "We come in peace", "You look weird"],
+  "Burger Shirt": ["Please go away", "Wanna collab?", "I believe in you"]
+};
 
-  <div id="dialog-box">Battle start! Pomgrante's turn.</div>
+function drawUI() {
+  ctx.clearRect(0, 0, battleCanvas.width, battleCanvas.height);
 
-  <div id="controls">
-    <button id="back-btn" disabled>Back</button>
-    <button id="confirm-btn" style="display:none;">Confirm</button>
-  </div>
+  // Draw characters
+  ctx.fillStyle = "white";
+  ctx.font = "16px monospace";
+  ctx.fillText("== YOUR TEAM ==", 10, 20);
 
-  <div id="mini-game-area">
-    <div id="aim-cursor"></div>
-    <!-- Targets will pop here -->
-  </div>
+  state.characters.forEach((ch, i) => {
+    let y = 40 + i * 30;
+    ctx.fillStyle = state.turnIndex === i ? "yellow" : "white";
+    ctx.fillText(`${ch.name}: ${ch.hp}/${ch.maxHp}`, 10, y);
+  });
 
-</div>
+  ctx.fillStyle = "red";
+  ctx.fillText(`ENEMY: ${state.enemy.name} ${state.enemy.hp}/${state.enemy.maxHp}`, 10, 150);
 
-<script>
-  const party = [
-    {
-      name: 'Pomgrante',
-      hp: 100,
-      maxHp: 100,
-      img: 'https://i.imgur.com/3xwL56R.png',
-      role: 'attacker',
-      moves: ['Gun (Attack)', 'Talk']
-    },
-    {
-      name: 'Potota',
-      hp: 120,
-      maxHp: 120,
-      img: 'https://i.imgur.com/d6EqIcM.png',
-      role: 'support',
-      moves: ['Talk']
-    },
-    {
-      name: 'Burger Pants',
-      hp: 80,
-      maxHp: 80,
-      img: 'https://i.imgur.com/bwVYrML.png',
-      role: 'mercy',
-      moves: ['Ask for Mercy']
-    }
-  ];
+  // Options UI
+  ctx.fillStyle = "white";
+  ctx.fillText("Select Action:", 10, 180);
 
-  let currentCharIndex = 0;
-  let enemyHp = 200;
-
-  let dialogBox = document.getElementById('dialog-box');
-  let backBtn = document.getElementById('back-btn');
-  let confirmBtn = document.getElementById('confirm-btn');
-  let partyMenuDiv = document.getElementById('party-menu');
-  let actionMenuDiv = document.getElementById('action-menu');
-  let miniGameArea = document.getElementById('mini-game-area');
-  let aimCursor = document.getElementById('aim-cursor');
-
-  let selectedActions = new Array(party.length).fill(null);
-  let buffedIndex = null;
-
-  let miniGameShots = 15;
-  let miniGameHits = 0;
-  let miniGameTargets = [];
-  let miniGameRunning = false;
-
-  // Dialog lines for talk options
-  const pomgranteTalks = [
-    "Hey, Layla, nice hat!",
-    "Do you wanna grab some tacos later?",
-    "I swear, I'm not afraid of you!"
-  ];
-  const pototaTalks = [
-    "You got this!",
-    "Stay strong, friend!",
-    "We believe in you!"
-  ];
-  const burgerTalks = [
-    "Please don't hurt me...",
-    "Mercy! Mercy!",
-    "I just want peace."
-  ];
-
-  function renderPartyMenu() {
-    partyMenuDiv.innerHTML = '';
-    party.forEach((char, i) => {
-      const memberDiv = document.createElement('div');
-      memberDiv.classList.add('party-member');
-      if (i === currentCharIndex) memberDiv.classList.add('current');
-      if (i === buffedIndex) memberDiv.classList.add('buff');
-      memberDiv.innerHTML = `
-        <img src="${char.img}" alt="${char.name}">
-        <div class="name">${char.name}</div>
-        <div class="hp-bar"><div class="hp-fill" style="width:${(char.hp / char.maxHp) * 100}%;"></div></div>
-      `;
-      // Allow clicking party members only when Potota chooses buff talk
-      if (party[currentCharIndex].role === 'support' && selectedActions[currentCharIndex] === 'Talk' && i !== currentCharIndex) {
-        memberDiv.style.cursor = 'pointer';
-        memberDiv.addEventListener('click', () => {
-          selectBuffTarget(i);
-        });
-      }
-      partyMenuDiv.appendChild(memberDiv);
+  let currentChar = state.characters[state.turnIndex];
+  let opts = actions[currentChar.name];
+  if (state.substate === "options") {
+    opts.forEach((opt, i) => {
+      ctx.fillStyle = i === state.selectedOption ? "cyan" : "white";
+      ctx.fillText(opt, 30 + i * 100, 210);
     });
   }
 
-  function renderActionMenu() {
-    actionMenuDiv.innerHTML = '';
-    const char = party[currentCharIndex];
-
-    if (char.role === 'attacker' && selectedActions[currentCharIndex] === 'Talk') {
-      // Show Pomgrante talk options
-      pomgranteTalks.forEach((line, idx) => {
-        const btn = document.createElement('button');
-        btn.classList.add('action-button');
-        btn.textContent = line;
-        btn.addEventListener('click', () => {
-          setDialog(`Pomgrante says: "${line}"`);
-          // Move to next character after talk option
-          confirmAction('Talk');
-        });
-        actionMenuDiv.appendChild(btn);
-      });
-      return;
-    }
-
-    if (char.role === 'support' && selectedActions[currentCharIndex] === 'Talk' && buffedIndex === null) {
-      setDialog('Choose a party member to encourage!');
-      // Wait for click on party member handled in renderPartyMenu
-      return;
-    }
-
-    if (char.role === 'mercy') {
-      burgerTalks.forEach(line => {
-        const btn = document.createElement('button');
-        btn.classList.add('action-button');
-        btn.textContent = line;
-        btn.addEventListener('click', () => {
-          setDialog(`Burger Pants says: "${line}"`);
-          confirmAction('Ask for Mercy');
-        });
-        actionMenuDiv.appendChild(btn);
-      });
-      return;
-    }
-
-    // Normal moves for attacker or support without talk options selected yet
-    char.moves.forEach(move => {
-      const btn = document.createElement('button');
-      btn.classList.add('action-button');
-      btn.textContent = move;
-      btn.addEventListener('click', () => {
-        if (move === 'Talk') {
-          selectedActions[currentCharIndex] = 'Talk';
-          renderActionMenu();
-          if (char.role !== 'support') {
-            // Pomgrante talk options show in renderActionMenu above
-          }
-        } else {
-          selectAction(move);
-        }
-      });
-      actionMenuDiv.appendChild(btn);
+  if (state.substate === "talk") {
+    let talks = talkOptions[currentChar.name];
+    talks.forEach((line, i) => {
+      ctx.fillStyle = i === state.selectedOption ? "cyan" : "white";
+      ctx.fillText(line, 30, 210 + i * 20);
     });
   }
 
-  function selectAction(action) {
-    selectedActions[currentCharIndex] = action;
-    setDialog(`${party[currentCharIndex].name} chose "${action}".`);
-
-    if (party[currentCharIndex].role !== 'support') {
-      confirmBtn.style.display = 'inline-block';
-    } else if (action === 'Talk' && buffedIndex === null) {
-      // Wait for buff target click
-      confirmBtn.style.display = 'none';
-    } else {
-      confirmBtn.style.display = 'inline-block';
-    }
+  if (state.substate === "confirm") {
+    ctx.fillStyle = "cyan";
+    ctx.fillText("Press Z to launch attack!", 10, 270);
   }
 
-  function confirmAction(forceAction) {
-    if (forceAction) {
-      selectedActions[currentCharIndex] = forceAction;
-    }
-    confirmBtn.style.display = 'none';
-    backBtn.disabled = false;
+  if (state.substate === "enemyTurn") {
+    ctx.fillStyle = "red";
+    ctx.fillText("ENEMY IS ATTACKING!", 10, 270);
+  }
+}
+// === PART 2: Controls & Input ===
+document.addEventListener("keydown", (e) => {
+  const currentChar = state.characters[state.turnIndex];
 
-    // Move to next character or start mini-game if Pomgrante attacked
-    if (currentCharIndex < party.length - 1) {
-      currentCharIndex++;
-      buffedIndex = null;
-      renderPartyMenu();
-      renderActionMenu();
-      setDialog(`It's ${party[currentCharIndex].name}'s turn.`);
-      updateBackBtn();
-    } else {
-      // All chosen, decide what to do
-      if (selectedActions[0] === 'Gun (Attack)') {
-        startPomgranteMiniGame();
+  if (state.substate === "options") {
+    if (e.key === "ArrowRight") {
+      state.selectedOption = (state.selectedOption + 1) % actions[currentChar.name].length;
+    } else if (e.key === "ArrowLeft") {
+      state.selectedOption = (state.selectedOption - 1 + actions[currentChar.name].length) % actions[currentChar.name].length;
+    } else if (e.key === "z") {
+      const selectedAction = actions[currentChar.name][state.selectedOption];
+      if (selectedAction === "Talk") {
+        state.substate = "talk";
+        state.selectedOption = 0;
       } else {
-        // If Pomgrante talked, skip mini-game and enemy attack directly
-        enemyAttack();
+        currentChar.action = selectedAction;
+        advanceTurn();
       }
     }
-  }
-
-  confirmBtn.addEventListener('click', () => confirmAction());
-
-  backBtn.addEventListener('click', () => {
-    if (currentCharIndex > 0) {
-      selectedActions[currentCharIndex] = null;
-      buffedIndex = null;
-      currentCharIndex--;
-      renderPartyMenu();
-      renderActionMenu();
-      setDialog(`Back to ${party[currentCharIndex].name}'s turn.`);
-      updateBackBtn();
-      confirmBtn.style.display = 'none';
+  } else if (state.substate === "talk") {
+    const talks = talkOptions[currentChar.name];
+    if (e.key === "ArrowDown") {
+      state.selectedOption = (state.selectedOption + 1) % talks.length;
+    } else if (e.key === "ArrowUp") {
+      state.selectedOption = (state.selectedOption - 1 + talks.length) % talks.length;
+    } else if (e.key === "z") {
+      currentChar.action = `Talk: ${talks[state.selectedOption]}`;
+      advanceTurn();
+    } else if (e.key === "x") {
+      state.substate = "options";
+      state.selectedOption = 0;
     }
-  });
-
-  function updateBackBtn() {
-    backBtn.disabled = currentCharIndex === 0; // Pomgrante no back
-  }
-
-  function selectBuffTarget(i) {
-    buffedIndex = i;
-    setDialog(`Potota encourages ${party[i].name}!`);
-    confirmBtn.style.display = 'inline-block';
-    renderPartyMenu();
-  }
-
-  function startPomgranteMiniGame() {
-    miniGameRunning = true;
-    miniGameShots = 15;
-    miniGameHits = 0;
-    confirmBtn.style.display = 'none';
-    backBtn.disabled = true;
-    actionMenuDiv.style.display = 'none';
-    miniGameArea.style.display = 'flex';
-    setDialog('Pomgrante\'s Mini-Game! Aim & click targets. Shots left: ' + miniGameShots);
-    spawnTargets();
-    setupAimCursor();
-  }
-
-  // Create targets that randomly pop up and down on mini-game area
-  function spawnTargets() {
-    miniGameArea.querySelectorAll('.target').forEach(t => t.remove());
-    miniGameTargets = [];
-    for (let i = 0; i < 10; i++) {
-      const target = document.createElement('div');
-      target.classList.add('target');
-      miniGameArea.appendChild(target);
-      miniGameTargets.push(target);
-    }
-    randomlyShowTargets();
-  }
-
-  function randomlyShowTargets() {
-    miniGameTargets.forEach(t => (t.style.display = 'none'));
-    // Show 3 random targets at a time
-    let count = 3;
-    let shown = 0;
-    const shuffled = miniGameTargets.sort(() => 0.5 - Math.random());
-    for (let i = 0; i < miniGameTargets.length && shown < count; i++) {
-      miniGameTargets[i].style.display = 'block';
-      shown++;
+  } else if (state.substate === "confirm") {
+    if (e.key === "z") {
+      state.substate = "attack";
+      launchAttack();
     }
   }
+});
 
-  function setupAimCursor() {
-    document.addEventListener('mousemove', mouseMoveHandler);
-    miniGameTargets.forEach(t => {
-      t.addEventListener('click', targetClickHandler);
-    });
+function advanceTurn() {
+  state.turnIndex++;
+  state.selectedOption = 0;
+
+  if (state.turnIndex >= state.characters.length) {
+    state.substate = "confirm";
+    state.turnIndex = 0;
+  } else {
+    state.substate = "options";
   }
+}
+// === PART 3: Minigame, Attack, Render ===
 
-  function mouseMoveHandler(e) {
-    aimCursor.style.left = e.clientX + 'px';
-    aimCursor.style.top = e.clientY + 'px';
-  }
-
-  function targetClickHandler(e) {
-    if (!miniGameRunning) return;
-    if (miniGameShots <= 0) return;
-    miniGameShots--;
-    miniGameHits += 15 + Math.floor(Math.random() * 6); // 15-20 damage per hit
-    setDialog(`Hit! Damage done: ${miniGameHits}. Shots left: ${miniGameShots}`);
-
-    // Hide the clicked target, show new random targets
-    e.target.style.display = 'none';
-    randomlyShowTargets();
-
-    if (miniGameShots === 0) {
-      endMiniGame();
-    }
-  }
-
-  function endMiniGame() {
-    miniGameRunning = false;
-    miniGameArea.style.display = 'none';
-    actionMenuDiv.style.display = 'flex';
-    document.removeEventListener('mousemove', mouseMoveHandler);
-    miniGameTargets.forEach(t => t.removeEventListener('click', targetClickHandler));
-
-    enemyHp -= miniGameHits;
-    if (enemyHp < 0) enemyHp = 0;
-    setDialog(`Mini-game over! Total damage to enemy: ${miniGameHits}. Enemy HP: ${enemyHp}`);
-
-    // Apply Potota buff if any
-    if (buffedIndex !== null) {
-      applyBuff(buffedIndex);
-    }
-
-    // Next enemy attack after short delay
-    setTimeout(() => {
-      enemyAttack();
-    }, 2500);
-  }
-
-  function applyBuff(i) {
-    const target = party[i];
-    // Simple buff: heal 15 HP, max capped
-    let healAmount = 15;
-    target.hp += healAmount;
-    if (target.hp > target.maxHp) target.hp = target.maxHp;
-    setDialog(`${target.name} got a buff! +${healAmount} HP`);
-    renderPartyMenu();
-  }
-
-  function enemyAttack() {
-    backBtn.disabled = true;
-    confirmBtn.style.display = 'none';
-    actionMenuDiv.style.display = 'none';
-    let damage =
-      function talkOptions() {
-  const talkTexts = [
-    "Pomgrante: Hey Layla, wanna talk it out?",
-    "Pomgrante: I once ate a whole cake... no regrets.",
-    "Pomgrante: You look like you could use a hug."
-  ];
-  let selected = 0;
-
-  const talkBox = document.createElement("div");
-  talkBox.id = "talkBox";
-  talkBox.style.position = "absolute";
-  talkBox.style.bottom = "20px";
-  talkBox.style.left = "50%";
-  talkBox.style.transform = "translateX(-50%)";
-  talkBox.style.backgroundColor = "#222";
-  talkBox.style.color = "white";
-  talkBox.style.padding = "15px";
-  talkBox.style.border = "2px solid #555";
-  talkBox.style.fontFamily = "'Press Start 2P', cursive";
-  talkBox.style.width = "300px";
-  talkBox.style.textAlign = "center";
-
-  const optionText = document.createElement("p");
-  optionText.textContent = talkTexts[selected];
-  talkBox.appendChild(optionText);
-
-  // Navigation buttons
-  const btnPrev = document.createElement("button");
-  btnPrev.textContent = "Previous";
-  btnPrev.onclick = () => {
-    selected = (selected - 1 + talkTexts.length) % talkTexts.length;
-    optionText.textContent = talkTexts[selected];
-  };
-
-  const btnNext = document.createElement("button");
-  btnNext.textContent = "Next";
-  btnNext.onclick = () => {
-    selected = (selected + 1) % talkTexts.length;
-    optionText.textContent = talkTexts[selected];
-  };
-
-  const btnConfirm = document.createElement("button");
-  btnConfirm.textContent = "Confirm";
-  btnConfirm.onclick = () => {
-    document.body.removeChild(talkBox);
-    // After confirm, enemy "laughs" or reacts, then enemy turn
-    showEnemyReact(() => enemyTurn());
-  };
-
-  const btnCancel = document.createElement("button");
-  btnCancel.textContent = "Cancel";
-  btnCancel.onclick = () => {
-    document.body.removeChild(talkBox);
-    // Go back to player action selection
-    playerActionMenu();
-  };
-
-  // Append buttons
-  [btnPrev, btnNext, btnConfirm, btnCancel].forEach(btn => {
-    btn.style.margin = "5px";
-    talkBox.appendChild(btn);
-  });
-
-  document.body.appendChild(talkBox);
+function launchAttack() {
+  state.enemy.hp -= 0; // damage comes from minigame
+  startMinigame();
 }
 
-// Simple enemy reaction function after talk confirm
-function showEnemyReact(callback) {
-  const reactBox = document.createElement("div");
-  reactBox.id = "reactBox";
-  reactBox.style.position = "absolute";
-  reactBox.style.top = "20px";
-  reactBox.style.left = "50%";
-  reactBox.style.transform = "translateX(-50%)";
-  reactBox.style.backgroundColor = "#550000";
-  reactBox.style.color = "white";
-  reactBox.style.padding = "20px";
-  reactBox.style.border = "2px solid #aa0000";
-  reactBox.style.fontFamily = "'Press Start 2P', cursive";
-  reactBox.style.textAlign = "center";
-  reactBox.style.zIndex = "1000";
-  reactBox.textContent = "Layla laughs at your talk...";
+function startMinigame() {
+  const targets = [];
+  for (let i = 0; i < 5; i++) {
+    targets.push({
+      x: Math.random() * 240 + 50,
+      y: Math.random() * 80 + 40,
+      alive: true
+    });
+  }
+  state.minigame = { cursorX: 160, targets, timer: 100 };
 
-  document.body.appendChild(reactBox);
+  const gameLoop = setInterval(() => {
+    const mg = state.minigame;
+    if (!mg) {
+      clearInterval(gameLoop);
+      return;
+    }
+    mg.timer--;
+
+    render();
+
+    if (mg.timer <= 0) {
+      const hits = mg.targets.filter(t => !t.alive).length;
+      const damage = hits * 20;
+      state.enemy.hp -= damage;
+      state.minigame = null;
+
+      setTimeout(() => {
+        enemyTurn();
+      }, 1000);
+
+      clearInterval(gameLoop);
+    }
+  }, 100);
+
+  document.addEventListener("keydown", minigameInput);
+}
+
+function minigameInput(e) {
+  const mg = state.minigame;
+  if (!mg) return;
+  if (e.key === "ArrowLeft") mg.cursorX -= 10;
+  if (e.key === "ArrowRight") mg.cursorX += 10;
+  if (e.key === "z") {
+    mg.targets.forEach(t => {
+      if (t.alive && Math.abs(t.x - mg.cursorX) < 20) t.alive = false;
+    });
+  }
+}
+
+function enemyTurn() {
+  const dmg = Math.floor(Math.random() * 20) + 30;
+  const target = state.characters[Math.floor(Math.random() * state.characters.length)];
+  target.hp = Math.max(0, target.hp - dmg);
 
   setTimeout(() => {
-    document.body.removeChild(reactBox);
-    callback();
-  }, 2000);
+    state.turnIndex = 0;
+    state.characters.forEach(c => c.action = null);
+    state.substate = "options";
+    render();
+  }, 1000);
 }
+
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // UI Frame
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Enemy
+  ctx.fillStyle = "red";
+  ctx.font = "bold 20px sans-serif";
+  ctx.fillText(`LAYLA HP: ${state.enemy.hp}`, 150, 30);
+
+  // Characters
+  state.characters.forEach((char, i) => {
+    ctx.fillStyle = i === state.turnIndex && state.substate === "options" ? "yellow" : "white";
+    ctx.fillText(`${char.name}: ${char.hp} HP`, 10, 60 + i * 20);
+  });
+
+  // Substates
+  const currentChar = state.characters[state.turnIndex];
+  if (state.substate === "options") {
+    const opts = actions[currentChar.name];
+    opts.forEach((opt, i) => {
+      ctx.fillStyle = i === state.selectedOption ? "lime" : "white";
+      ctx.fillText(opt, 150 + i * 80, 100);
+    });
+  } else if (state.substate === "talk") {
+    const opts = talkOptions[currentChar.name];
+    opts.forEach((opt, i) => {
+      ctx.fillStyle = i === state.selectedOption ? "cyan" : "white";
+      ctx.fillText(opt, 10, 150 + i * 20);
+    });
+    ctx.fillStyle = "gray";
+    ctx.fillText("[X] Cancel", 10, 240);
+  } else if (state.substate === "confirm") {
+    ctx.fillStyle = "white";
+    ctx.fillText("Press Z to LAUNCH ATTACK!", 100, 200);
+  }
+
+  // Minigame
+  if (state.minigame) {
+    ctx.fillStyle = "orange";
+    state.minigame.targets.forEach(t => {
+      if (t.alive) ctx.fillRect(t.x, t.y, 10, 10);
+    });
+
+    ctx.strokeStyle = "white";
+    ctx.beginPath();
+    ctx.moveTo(state.minigame.cursorX, 120);
+    ctx.lineTo(state.minigame.cursorX, 130);
+    ctx.stroke();
+  }
+}
+
+setInterval(render, 100);
