@@ -1,543 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Deltarune Style Battle</title>
-<style>
-  /* Simple pixel/deltarune-style UI */
-  body {
-    background: #222;
-    color: #eee;
-    font-family: 'Press Start 2P', monospace;
-    margin: 0; padding: 0;
-    user-select: none;
-  }
-  #battle-container {
-    max-width: 600px;
-    margin: 20px auto;
-    background: #111;
-    border: 4px solid #555;
-    padding: 20px;
-  }
-  #character-info {
-    border: 2px solid #444;
-    background: #333;
-    padding: 10px;
-    margin-bottom: 10px;
-  }
-  #action-menu, #talk-menu, #target-menu, #mini-game {
-    background: #222;
-    border: 2px solid #666;
-    padding: 10px;
-    margin-top: 10px;
-  }
-  .menu-option {
-    cursor: pointer;
-    padding: 5px;
-    margin: 3px 0;
-    border: 1px solid transparent;
-  }
-  .menu-option.selected, .menu-option:hover {
-    border: 1px solid #eee;
-    background: #555;
-  }
-  #dialog-box {
-    background: #111;
-    border: 2px solid #666;
-    padding: 10px;
-    margin-top: 10px;
-    min-height: 60px;
-  }
-  #mini-game-canvas {
-    background: black;
-    display: block;
-    margin: 10px auto;
-    border: 2px solid #eee;
-  }
-  #cancel-button {
-    margin-top: 10px;
-    cursor: pointer;
-    background: #444;
-    border: none;
-    color: #eee;
-    padding: 5px 10px;
-    font-family: monospace;
-  }
-  #cancel-button:hover {
-    background: #666;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Comic 2 - Empty Pages</title>
+  
+  <!-- Link to XP.css for Windows XP Styling -->
+  <link rel="stylesheet" href="https://unpkg.com/xp.css">
+
+  <style>
+    body {
+      background-color: #0033cc;
+      color: white;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .comic-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .panel {
+      width: 95%;
+      max-width: 800px;
+      background-color: #f0f0f0;
+      border: 2px solid #2e4f8f;
+      margin: 10px 0;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: none;
+      min-height: 400px; /* so empty panels have some height */
+    }
+
+    .panel img {
+      width: 100%;
+      height: auto;
+      border: 2px solid #2e4f8f;
+      margin-bottom: 10px;
+    }
+
+    .panel p {
+      color: #2e4f8f;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .navigation {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .nav-button {
+      background-color: transparent;
+      color: #2e4f8f;
+      padding: 10px 20px;
+      margin: 0 10px;
+      text-decoration: none;
+      border: 2px solid #2e4f8f;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .nav-button:hover {
+      background-color: #2e4f8f;
+      color: white;
+    }
+
+    .nav-button:disabled {
+      color: #888;
+      border-color: #888;
+      cursor: not-allowed;
+    }
+
+    #progress {
+      text-align: center;
+      margin-top: 10px;
+      color: white;
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="battle-container">
-  <div id="character-info">
-    <strong id="char-name"></strong><br />
-    HP: <span id="char-hp"></span>
+  <!-- Comic Panels -->
+  <div class="comic-container" id="comicContainer">
+    <!-- Panels will be injected here -->
   </div>
 
-  <div id="action-menu" style="display:none;">
-    <div class="menu-option" data-action="attack">Attack (Gun)</div>
-    <div class="menu-option" data-action="talk">Talk</div>
+  <!-- Progress Indicator -->
+  <p id="progress"></p>
+
+  <!-- Navigation Buttons -->
+  <div class="navigation">
+    <button class="nav-button" id="prevButton" onclick="navigate(-1)" disabled>Previous</button>
+    <button class="nav-button" id="nextButton" onclick="navigate(1)">Next</button>
+    <button class="nav-button" onclick="window.location.href='index.html'">Home</button>
+    <button class="nav-button" onclick="window.location.href='comic1.html'">Comic 1</button>
   </div>
 
-  <div id="talk-menu" style="display:none;">
-    <div class="menu-option">How's your day?</div>
-    <div class="menu-option">Tell me a joke</div>
-    <div class="menu-option">Say goodbye</div>
-  </div>
+  <script>
+    // Empty panels for Comic 2 — 10 blank pages for example
+    const comicPanels = [
+      { image: "", text: "" },
+      { image: "", text: "" },
+      { image: "", text: "" },
+      { image: "", text: "" },
+      { image: "", text: "" },
+      { image: "", text: "" },
+      { image: "", text: "" },
+      { image: "", text: "" },
+      { image: "", text: "" },
+      { image: "", text: "" }
+    ];
 
-  <div id="target-menu" style="display:none;">
-    <div class="menu-option" data-target="pomgrante">Pomgrante</div>
-    <div class="menu-option" data-target="potota">Potota</div>
-  </div>
+    let currentPanel = 0;
 
-  <button id="cancel-button" style="display:none;">Cancel</button>
+    function loadComic() {
+      const container = document.getElementById('comicContainer');
+      comicPanels.forEach((panel, index) => {
+        const div = document.createElement('div');
+        div.className = 'panel';
+        div.style.display = index === 0 ? 'block' : 'none';
 
-  <div id="dialog-box"></div>
+        // If there is an image, show it, else just leave empty
+        let innerHTML = '';
+        if (panel.image) {
+          innerHTML += `<img src="${panel.image}" alt="Panel ${index + 1}">`;
+        }
+        if (panel.text) {
+          innerHTML += `<p>${panel.text}</p>`;
+        }
 
-  <canvas id="mini-game-canvas" width="400" height="100" style="display:none;"></canvas>
-</div>
-
-<script>
-  // Characters & state
-  const characters = [
-    { name: 'Pomgrante', hp: 100, maxHp: 100, role: 'attacker' },
-    { name: 'Potota', hp: 160, maxHp: 160, role: 'support' },
-    { name: 'Burger Shirt', hp: 120, maxHp: 120, role: 'mercy' }
-  ];
-  let enemy = { name: 'Layla', hp: 300, maxHp: 300 };
-
-  let currentCharIndex = 0;
-  let phase = 'chooseAction'; // can be chooseAction, chooseTalk, chooseTarget, miniGame, enemyTurn
-  let selectedAction = null;
-  let selectedTalkIndex = null;
-  let selectedTarget = null;
-
-  const charNameEl = document.getElementById('char-name');
-  const charHpEl = document.getElementById('char-hp');
-  const actionMenu = document.getElementById('action-menu');
-  const talkMenu = document.getElementById('talk-menu');
-  const targetMenu = document.getElementById('target-menu');
-  const dialogBox = document.getElementById('dialog-box');
-  const cancelButton = document.getElementById('cancel-button');
-  const miniGameCanvas = document.getElementById('mini-game-canvas');
-  const ctx = miniGameCanvas.getContext('2d');
-
-  function updateCharacterInfo() {
-    const char = characters[currentCharIndex];
-    charNameEl.textContent = char.name;
-    charHpEl.textContent = `${char.hp} / ${char.maxHp}`;
-  }
-
-  function showActionMenu() {
-    phase = 'chooseAction';
-    actionMenu.style.display = 'block';
-    talkMenu.style.display = 'none';
-    targetMenu.style.display = 'none';
-    cancelButton.style.display = currentCharIndex === 0 ? 'none' : 'inline-block';
-    dialogBox.textContent = '';
-    selectedAction = null;
-    highlightOption(actionMenu, 0);
-  }
-
-  function showTalkMenu() {
-    phase = 'chooseTalk';
-    actionMenu.style.display = 'none';
-    talkMenu.style.display = 'block';
-    targetMenu.style.display = 'none';
-    cancelButton.style.display = 'inline-block';
-    dialogBox.textContent = 'Choose a topic to talk about:';
-    highlightOption(talkMenu, 0);
-  }
-
-  function showTargetMenu() {
-    phase = 'chooseTarget';
-    actionMenu.style.display = 'none';
-    talkMenu.style.display = 'none';
-    targetMenu.style.display = 'block';
-    cancelButton.style.display = 'inline-block';
-    dialogBox.textContent = 'Choose a target:';
-    highlightOption(targetMenu, 0);
-  }
-
-  function nextCharacter() {
-    currentCharIndex++;
-    if (currentCharIndex >= characters.length) {
-      currentCharIndex = 0;
-      enemyTurn();
-      return;
+        div.innerHTML = innerHTML;
+        container.appendChild(div);
+      });
+      updateProgress();
     }
-    updateCharacterInfo();
-    showActionMenu();
-  }
 
-  // Highlighting menu option by keyboard navigation
-  function highlightOption(menuEl, index) {
-    const options = menuEl.querySelectorAll('.menu-option');
-    options.forEach((opt, i) => {
-      opt.classList.toggle('selected', i === index);
+    function navigate(direction) {
+      const panels = document.querySelectorAll('.panel');
+      const newIndex = currentPanel + direction;
+      if (newIndex >= 0 && newIndex < panels.length) {
+        panels[currentPanel].style.display = 'none';
+        currentPanel = newIndex;
+        panels[currentPanel].style.display = 'block';
+        document.getElementById('prevButton').disabled = currentPanel === 0;
+        document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
+        updateProgress();
+      }
+    }
+
+    function updateProgress() {
+      document.getElementById('progress').textContent = `Page ${currentPanel + 1} of ${comicPanels.length}`;
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') navigate(1);
+      if (e.key === 'ArrowLeft') navigate(-1);
     });
-    menuEl.selectedIndex = index;
-  }
 
-  function getSelectedIndex(menuEl) {
-    return menuEl.selectedIndex || 0;
-  }
+    document.addEventListener('DOMContentLoaded', loadComic);
+  </script>
 
-  // Keyboard navigation variables
-  let navIndex = 0;
-
-  // Setup keyboard listeners
-  document.addEventListener('keydown', (e) => {
-    if (phase === 'chooseAction') {
-      const options = actionMenu.querySelectorAll('.menu-option');
-      if (e.key === 'ArrowDown') {
-        navIndex = (navIndex + 1) % options.length;
-        highlightOption(actionMenu, navIndex);
-      } else if (e.key === 'ArrowUp') {
-        navIndex = (navIndex - 1 + options.length) % options.length;
-        highlightOption(actionMenu, navIndex);
-      } else if (e.key === 'Enter') {
-        selectedAction = options[navIndex].dataset.action;
-        if (selectedAction === 'attack') {
-          startMiniGame();
-        } else if (selectedAction === 'talk') {
-          showTalkMenu();
-        }
-      }
-    } else if (phase === 'chooseTalk') {
-      const options = talkMenu.querySelectorAll('.menu-option');
-      if (e.key === 'ArrowDown') {
-        navIndex = (navIndex + 1) % options.length;
-        highlightOption(talkMenu, navIndex);
-      } else if (e.key === 'ArrowUp') {
-        navIndex = (navIndex - 1 + options.length) % options.length;
-        highlightOption(talkMenu, navIndex);
-      } else if (e.key === 'Enter') {
-        selectedTalkIndex = navIndex;
-        doTalk(selectedTalkIndex);
-      }
-    } else if (phase === 'chooseTarget') {
-      const options = targetMenu.querySelectorAll('.menu-option');
-      if (e.key === 'ArrowDown') {
-        navIndex = (navIndex + 1) % options.length;
-        highlightOption(targetMenu, navIndex);
-      } else if (e.key === 'ArrowUp') {
-        navIndex = (navIndex - 1 + options.length) % options.length;
-        highlightOption(targetMenu, navIndex);
-      } else if (e.key === 'Enter') {
-        const options = targetMenu.querySelectorAll('.menu-option');
-        selectedTarget = options[navIndex].dataset.target;
-        doBuff(selectedTarget);
-      }
-    }
-  });
-
-  cancelButton.addEventListener('click', () => {
-    if (phase === 'chooseTalk' || phase === 'chooseTarget') {
-      showActionMenu();
-      navIndex = 0;
-      highlightOption(actionMenu, navIndex);
-    }
-  });
-
-  // TALK dialog responses
-  const talkResponses = [
-    "It's a lovely day, isn't it?",
-    "Why did the chicken cross the road? To get to the other side!",
-    "Goodbye! See you soon!"
-  ];
-
-  function doTalk(index) {
-    dialogBox.textContent = talkResponses[index];
-    setTimeout(() => {
-      showActionMenu();
-      navIndex = 0;
-      highlightOption(actionMenu, navIndex);
-    }, 2000);
-  }
-
-  // Buff function (Potota's encourage)
-  function doBuff(targetName) {
-    dialogBox.textContent = `${targetName} feels encouraged! (+5 DMG for next attack)`;
-    setTimeout(() => {
-      // For simplicity just show message; you can expand later
-      nextCharacter();
-    }, 2000);
-  }
-
-  // Mini-game variables & function start
-  let miniGameShots = 0;
-  const shotsToHit = 5; // each shot does 15-20 dmg
-
-  function startMiniGame() {
-    phase = 'miniGame';
-    actionMenu.style.display = 'none';
-    talkMenu.style.display = 'none';
-    targetMenu.style.display = 'none';
-    cancelButton.style.display = 'none';
-    dialogBox.textContent = 'Mini-game: Shoot the cans! Press Space to shoot.';
-
-    miniGameCanvas.style.display = 'block';
-    miniGameShots = 0;
-    setupMiniGame();
-  }
-
-  function setupMiniGame() {
-    ctx.clearRect(0, 0, miniGameCanvas.width, miniGameCanvas.height);
-    // Draw cans or targets - simplified as rectangles here
-    drawCans();
-  }
-
-  function drawCans() {
-    ctx.clearRect(0, 0, miniGameCanvas.width, miniGameCanvas.height);
-    for (let i = 0; i < shotsToHit; i++) {
-      let x = 50 + i * 70;
-      ctx.fillStyle = 'red';
-      ctx.fillRect(x, 50, 40, 40);
-    }
-    // Draw crosshair with mouse position (or center for now)
-    ctx.strokeStyle = 'white';
-    ctx.beginPath();
-    ctx.moveTo(200, 40);
-    ctx.lineTo(200, 90);
-    ctx.moveTo(180, 65);
-    ctx.lineTo(220, 65);
-    ctx.stroke();
-  }
-
-  // Mini-game shooting with spacebar (for demo)
-  document.addEventListener('keydown', (e) => {
-    if (phase === 'miniGame' && e.code === 'Space') {
-      miniGameShots++;
-      dialogBox.textContent = `Shot ${miniGameShots} fired!`;
-      if (miniGameShots >= shotsToHit) {
-        finishMiniGame();
-      } else {
-        drawCans();
-      }
-    }
-  });
-
-  function finishMiniGame() {
-    miniGameCanvas.style.display = 'none';
-    dialogBox.textContent = 'Pomgrante attacks Layla!';
-
-    // Apply damage: 15-20 per shot
-    const damage = miniGameShots * (15 + Math.floor(Math.random() * 6));
-    enemy.hp -= damage;
-    if (enemy.hp < 0) enemy.hp = 0;
-    dialogBox.textContent += ` Dealt ${damage} damage! Layla HP: ${enemy.hp}`;
-
-    if (enemy.hp <= 0) {
-      dialogBox.textContent += ' Layla defeated! You win!';
-      // Here you could do the win sequence or move to next comic page
-    }
-
-    setTimeout(() => {
-      nextCharacter();
-    }, 3000);
-  }
-
-  // Enemy turn stub
-  function enemyTurn() {
-    phase = 'enemyTurn';
-    dialogBox.textContent = `Layla attacks!`;
-
-    setTimeout(() => {
-      // Random damage 30-50
-      const dmg = 30 + Math.floor(Math.random() * 21);
-      // Target random character
-      const targetIndex = Math.floor(Math.random() * characters.length);
-      characters[targetIndex].hp -= dmg;
-      if (characters[targetIndex].hp < 0) characters[targetIndex].hp = 0;
-      dialogBox.textContent = `Layla deals ${dmg} damage to ${characters[targetIndex].name}!`;
-      updateCharacterInfo();
-
-      setTimeout(() => {
-        // Check for KO
-        if (characters.every(c => c.hp <= 0)) {
-          dialogBox.textContent = 'All characters defeated. Game Over!';
-          // You can reset or stop here
-        } else {
-          currentCharIndex = 0;
-          updateCharacterInfo();
-          showActionMenu();
-          navIndex = 0;
-          highlightOption(actionMenu, navIndex);
-        }
-      }, 2000);
-    }, 2000);
-  }
-
-  // Init
-  updateCharacterInfo();
-  showActionMenu();
- // Continue from previous code
-
-  // Add Burger Shirt's action menu and logic
-  // We modify action menu dynamically based on character role
-  function updateActionMenuOptions() {
-    // Clear current options
-    actionMenu.innerHTML = '';
-
-    const char = characters[currentCharIndex];
-    if (char.role === 'attacker') {
-      // Pomgrante options
-      const attack = document.createElement('div');
-      attack.className = 'menu-option';
-      attack.dataset.action = 'attack';
-      attack.textContent = 'Attack (Gun)';
-      actionMenu.appendChild(attack);
-
-      const talk = document.createElement('div');
-      talk.className = 'menu-option';
-      talk.dataset.action = 'talk';
-      talk.textContent = 'Talk';
-      actionMenu.appendChild(talk);
-    } else if (char.role === 'support') {
-      // Potota options - only encourage (buff) + talk
-      const encourage = document.createElement('div');
-      encourage.className = 'menu-option';
-      encourage.dataset.action = 'encourage';
-      encourage.textContent = 'Encourage (Buff)';
-      actionMenu.appendChild(encourage);
-
-      const talk = document.createElement('div');
-      talk.className = 'menu-option';
-      talk.dataset.action = 'talk';
-      talk.textContent = 'Talk';
-      actionMenu.appendChild(talk);
-    } else if (char.role === 'mercy') {
-      // Burger Shirt - only ask for mercy
-      const mercy = document.createElement('div');
-      mercy.className = 'menu-option';
-      mercy.dataset.action = 'mercy';
-      mercy.textContent = 'Ask for Mercy';
-      actionMenu.appendChild(mercy);
-    }
-  }
-
-  // Override showActionMenu to update options dynamically
-  function showActionMenu() {
-    phase = 'chooseAction';
-    updateActionMenuOptions();
-    actionMenu.style.display = 'block';
-    talkMenu.style.display = 'none';
-    targetMenu.style.display = 'none';
-    cancelButton.style.display = currentCharIndex === 0 ? 'none' : 'inline-block';
-    dialogBox.textContent = '';
-    selectedAction = null;
-    navIndex = 0;
-    highlightOption(actionMenu, navIndex);
-  }
-
-  // Extend keyboard listener to handle new actions
-  document.addEventListener('keydown', (e) => {
-    if (phase === 'chooseAction') {
-      const options = actionMenu.querySelectorAll('.menu-option');
-      if (e.key === 'ArrowDown') {
-        navIndex = (navIndex + 1) % options.length;
-        highlightOption(actionMenu, navIndex);
-      } else if (e.key === 'ArrowUp') {
-        navIndex = (navIndex - 1 + options.length) % options.length;
-        highlightOption(actionMenu, navIndex);
-      } else if (e.key === 'Enter') {
-        selectedAction = options[navIndex].dataset.action;
-        if (selectedAction === 'attack') {
-          startMiniGame();
-        } else if (selectedAction === 'talk') {
-          showTalkMenu();
-        } else if (selectedAction === 'encourage') {
-          showTargetMenu();
-        } else if (selectedAction === 'mercy') {
-          doMercy();
-        }
-      }
-    }
-  });
-
-  // Mercy action for Burger Shirt
-  function doMercy() {
-    dialogBox.textContent = 'Burger Shirt begs for mercy... Layla is amused!';
-    setTimeout(() => {
-      nextCharacter();
-    }, 2500);
-  }
-
-  // Update doBuff to actually apply a buff (example: add temp damage)
-  function doBuff(targetName) {
-    dialogBox.textContent = `${targetName} feels encouraged! (+5 DMG for next attack)`;
-    // For demo, we won't fully implement damage buff stacking here
-    setTimeout(() => {
-      nextCharacter();
-    }, 2000);
-  }
-
-  // Extend talk responses for funny dialogs
-  const talkResponses = [
-    "It's a lovely day, isn't it?",
-    "Why did the chicken cross the road? To get to the other side!",
-    "Goodbye! See you soon!"
-  ];
-
-  function doTalk(index) {
-    dialogBox.textContent = talkResponses[index];
-    setTimeout(() => {
-      showActionMenu();
-      navIndex = 0;
-      highlightOption(actionMenu, navIndex);
-    }, 2000);
-  }
-
-  // Cancel button improves — goes back one phase only if allowed
-  cancelButton.addEventListener('click', () => {
-    if (phase === 'chooseTalk' || phase === 'chooseTarget') {
-      showActionMenu();
-    }
-  });
-
-  // Make sure to call updateActionMenuOptions when next character changes
-  function nextCharacter() {
-    currentCharIndex++;
-    if (currentCharIndex >= characters.length) {
-      currentCharIndex = 0;
-      enemyTurn();
-      return;
-    }
-    updateCharacterInfo();
-    showActionMenu();
-  }
-
-  // Additional polish: when enemy defeated, stop game
-  function finishMiniGame() {
-    miniGameCanvas.style.display = 'none';
-    dialogBox.textContent = 'Pomgrante attacks Layla!';
-
-    // Apply damage: 15-20 per shot
-    const damage = miniGameShots * (15 + Math.floor(Math.random() * 6));
-    enemy.hp -= damage;
-    if (enemy.hp < 0) enemy.hp = 0;
-    dialogBox.textContent += ` Dealt ${damage} damage! Layla HP: ${enemy.hp}`;
-
-    if (enemy.hp <= 0) {
-      dialogBox.textContent += ' Layla defeated! You win!';
-      // Disable input
-      phase = 'gameOver';
-      return;
-    }
-
-    setTimeout(() => {
-      nextCharacter();
-    }, 3000);
-  }
-
-  // Initialize the first turn again (just in case)
-  updateCharacterInfo();
-  showActionMenu();
-
-</script>
+</body>
+</html>
 
 </body>
 </html>
