@@ -2,8 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Comic 2 - Empty Pages</title>
+  <title>oh a evil guy</title>
+  
+  <!-- Link to XP.css for Windows XP Styling -->
   <link rel="stylesheet" href="https://unpkg.com/xp.css">
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CR9QE2X88K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-CR9QE2X88K');
+  </script>
+
   <style>
     body {
       background-color: #0033cc;
@@ -30,8 +42,8 @@
       border: 2px solid #2e4f8f;
       margin: 10px 0;
       padding: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       display: none;
-      min-height: 400px;
     }
 
     .panel img {
@@ -61,6 +73,7 @@
       border: 2px solid #2e4f8f;
       cursor: pointer;
       font-size: 16px;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     .nav-button:hover {
@@ -74,76 +87,34 @@
       cursor: not-allowed;
     }
 
+    .shaky {
+      display: inline-block;
+      animation: shake 0.15s infinite;
+    }
+
+    @keyframes shake {
+      0%   { transform: translate(1px, 1px) rotate(0deg); }
+      10%  { transform: translate(-1px, -2px) rotate(-1deg); }
+      20%  { transform: translate(-3px, 0px) rotate(1deg); }
+      30%  { transform: translate(3px, 2px) rotate(0deg); }
+      40%  { transform: translate(1px, -1px) rotate(1deg); }
+      50%  { transform: translate(-1px, 2px) rotate(-1deg); }
+      60%  { transform: translate(-3px, 1px) rotate(0deg); }
+      70%  { transform: translate(3px, 1px) rotate(-1deg); }
+      80%  { transform: translate(-1px, -1px) rotate(1deg); }
+      90%  { transform: translate(1px, 2px) rotate(0deg); }
+      100% { transform: translate(1px, -2px) rotate(-1deg); }
+    }
+
     #progress {
       text-align: center;
       margin-top: 10px;
       color: white;
     }
-
-    #inventoryButton {
-      position: fixed;
-      left: 10px;
-      top: 10px;
-      z-index: 100;
-      cursor: pointer;
-    }
-
-    #inventoryWindow {
-      position: fixed;
-      left: 10px;
-      top: 50px;
-      z-index: 99;
-      width: 240px;
-      background: white;
-      border: 2px solid #2e4f8f;
-      display: none;
-    }
-
-    #inventoryItems {
-      display: flex;
-      flex-wrap: wrap;
-      padding: 10px;
-      background-color: white;
-      color: black;
-    }
-
-    .item-box {
-      margin: 10px;
-      text-align: center;
-    }
-
-    .item-box img {
-      width: 200px;
-      height: 200px;
-      display: block;
-      margin: 0 auto;
-      border: 1px solid #2e4f8f;
-    }
-
-    .item-label {
-      margin-top: 5px;
-      font-weight: bold;
-    }
   </style>
 </head>
 
 <body>
-
-  <!-- Inventory Button -->
-  <img src="https://i.imgur.com/mtbS8Wk.png" id="inventoryButton" alt="Inventory" width="32" height="32">
-
-  <!-- Inventory Window -->
-  <div id="inventoryWindow" class="window">
-    <div class="title-bar">
-      <div class="title-bar-text">Inventory</div>
-      <div class="title-bar-controls">
-        <button aria-label="Close" onclick="toggleInventory()"></button>
-      </div>
-    </div>
-    <div class="window-body" id="inventoryItems">
-      <p>Inventory is empty.</p>
-    </div>
-  </div>
 
   <!-- Comic Panels -->
   <div class="comic-container" id="comicContainer">
@@ -158,119 +129,73 @@
     <button class="nav-button" id="prevButton" onclick="navigate(-1)" disabled>Previous</button>
     <button class="nav-button" id="nextButton" onclick="navigate(1)">Next</button>
     <button class="nav-button" onclick="window.location.href='index.html'">Home</button>
-    <button class="nav-button" onclick="window.location.href='comic1.html'">Comic 1</button>
+    <button class="nav-button" onclick="window.location.href='comic2.html'">Comic 2</button>
   </div>
 
- <script>
-  const comicPanels = Array(10).fill({ image: "", text: "" });
-  let currentPanel = 0;
+  <script>
+    const comicPanels = [
+      { image: "pages/png1.png", text: "..." },
+      { image: "pages/Png2.png", text: "..." },
+      { image: "pages/Gif.gif", text: "??? : whats in there...." },
+      { image: "pages/Png4.gif", text: "??? : how about you go check<br><br>???: uhhhh ok *trips on nothing*" },
+      { image: "pages/Png5.gif", text: "<span style='color:#800080;'>INTRODUCING POTOTA<br><br>UNIT'S PURPOSE: UNKNOWN<br><br>HP: 160 &nbsp;&nbsp; DMG: 20<br><br>ABILITIES and TRAITS:<br>DUMB LUCK III<br>SMARTS II<br>KINDNESS IIII (sometimes...)</span>" },
+      { image: "pages/Png6.gif", text: "??? : coming down...." },
+      { image: "pages/Png8.gif", text: "<span style='color:#DC143C;'>INTRODUCING POMGRANTE<br><br>UNIT'S PURPOSE: UNKNOWN ALSO..<br><br>HP: 100 &nbsp;&nbsp; DMG: 80<br><br>ABILITIES and TRAITS:<br>RADNESS III<br>GUN IIIII<br>STREET SMARTS III<br>REAL SMARTS 0</span>" },
+      { image: "pages/PNG8.png", text: "<span style='color:#800080;'>POT : looks like a lab in here</span><br><br><span style='color:#DC143C;'>POM : yeah like one of those school ones..</span>" },
+      { image: "pages/Png10.gif", text: "POM an POT: *looks behinde JUMPS BACK SCARED going like AHHHHH WHA THA ??!!?! AAHHhhh...<br><br><br> dang red line..." },
+      { image: "pages/Png9.png", text: "<span style='color:#434a4f;'>INTRODUCING DR. EVIL<br><br>UNIT'S PURPOSE: MAKER OF EVIL STUFF like idk the french<br><br>HP: 200 &nbsp;&nbsp; DMG: 50<br><br>ABILITIES and TRAITS:<br>ROCK IIIII<br>SMARTS IIIII<br>EVILNESS I<br>BULLET PROOF III</span>" },
+      { image: "pages/Png11.png", text: "<span style='color:#DC143C;'>POM : hold up err we me and my brother are just here to.... AH HEAR ABOUTH YOU [pomgrante used LYING it was very effective]</span><br><br><span style='color:#434a4f;'>DR : OOOOHHH well if you wanna know all about ME</span>" },
+      { image: "pages/Png12.gif", text: "<span style='color:#434a4f;'>DR : ive made sooo MANY evil things like clowns, people who ride scooters, the word MOIST ,goatees, goat ,soundcloud rappers and the BEST thing ive made the BIRD FLU--</span><br><br><span style='color:#800080;'>POT : yea they tend to do that</span>" },
+      { image: "pages/Png13.png", text: "<span style='color:#434a4f;'>DR : LOOK WHERE AM POINTING THE BIRD FLU LOOK! LOOK!</span><br><br><span style='color:#800080;'>POT: OOOOOH BIRD FLU like the sickness</span>" },
+      { image: "pages/Png14.png", text: "<span style='color:#DC143C;'> <span class='shaky'>POM : THE BIRD FLU KILLED MY BEST FREAIND WHEN I WAS A CHILD</span>" },
+      { image: "pages/Png15.png", text: "<span style='color:#DC143C;'>POM : I POMGRANTE CHALLENGE YOU DR EVIL TO A BATTEL REASON <span class='shaky'>REVANGE</span><br><br><span style='color:#800080;'>POT : what if he's apologies and becomes DR. GOOD</span><br><br><span style='color:#434a4f;'>DR: no</span>" },
+      { image: "pages/Png16.gif", text: "[BATTEL LOG STARTER]<br><br><span style='color:#800080;'>[POTOTA USES ENCOURAGE ON POMGRANTE]</span><br><br><span style='color:#DC143C;'>[POMGRANTE GAINS +5 COMBAT DAMGE, POMGRANTE USES GUN IT DOES 0 DMG]<br>POM : FUDGE HE'S BULLET PROOF!<br><br></span><span style='color:#434a4f;'>[DR. EVIL USES FLASK OF BURNING COOL-AID DEALS 50 DMG and 5 PERMANENT]<br><br></span><span style='color:#DC143C;'>[POMGRANTE HP 50/95]<br>POM : WHO DRINKS COOL-AID HOTTTT!!?</span>" },
+      { image: "pages/Png17.png", text: "<span style='color:#800080;'>POT : HMMMMM hes bullet proof but is he potota proof?</span><br><br><span style='color:#DC143C;'>POM : what are you getting at, what we use you as ammo?</span><br><br><span style='color:#800080;'>POT : yuppers!</span>" },
+      { image: "pages/Png18.gif", text: "[BATTEL LOG CONTINUED]<br><br>[POMGRANTE AND POTOTA USE THEREE SUPER MOVE POTOTA LAUNCHER DEALS 500 DMG]<br><br>[DR. EVIL HAS BEEN KNOCKED OUT you could say in a way]" },
+      { image: "pages/Png19.png", text: "and so these two brother won agaist a evil doctor guy so yk he would't make more evil stuff stay tuned folks" },
+      { image: "pages/Love.gif", text: "thanks for reading this comic might be a bit funky with stray pixels but i promise it will get much better<br>made by me pickdel<br><br>thanks to my buddy addy for giving a list of evil thing for dr evil to say" },
+    ];
 
-  // Inventory from localStorage, or default with some items
-  let inventory = JSON.parse(localStorage.getItem("comicInventory")) || ["Map", "Apple"];
+    let currentPanel = 0;
 
-  // Track claimed items per page
-  let claimedRewards = JSON.parse(localStorage.getItem("claimedComicRewards")) || {};
-
-  // 👇 PAGE-UNIQUE REWARD
-  const pageRewardKey = "comic2";   // Unique ID for this page
-  const pageRewardItem = "Key";     // Item to give
-
-  // ✅ Automatically grant the item ONCE
-  function grantPageReward() {
-    if (!claimedRewards[pageRewardKey]) {
-      addItem(pageRewardItem);
-      claimedRewards[pageRewardKey] = true;
-      localStorage.setItem("claimedComicRewards", JSON.stringify(claimedRewards));
-      console.log(`🎁 Granted item "${pageRewardItem}" for visiting this page!`);
-    }
-  }
-
-  function loadComic() {
-    const container = document.getElementById('comicContainer');
-    comicPanels.forEach((panel, index) => {
-      const div = document.createElement('div');
-      div.className = 'panel';
-      div.style.display = index === 0 ? 'block' : 'none';
-
-      let innerHTML = '';
-      if (panel.image) innerHTML += `<img src="${panel.image}" alt="Panel ${index + 1}">`;
-      if (panel.text) innerHTML += `<p>${panel.text}</p>`;
-
-      div.innerHTML = innerHTML;
-      container.appendChild(div);
-    });
-
-    updateProgress();
-    grantPageReward();            // 👈 Give item once
-    updateInventoryDisplay();
-  }
-
-  function navigate(direction) {
-    const panels = document.querySelectorAll('.panel');
-    const newIndex = currentPanel + direction;
-    if (newIndex >= 0 && newIndex < panels.length) {
-      panels[currentPanel].style.display = 'none';
-      currentPanel = newIndex;
-      panels[currentPanel].style.display = 'block';
-      document.getElementById('prevButton').disabled = currentPanel === 0;
-      document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
+    function loadComic() {
+      const container = document.getElementById('comicContainer');
+      comicPanels.forEach((panel, index) => {
+        const div = document.createElement('div');
+        div.className = 'panel';
+        div.style.display = index === 0 ? 'block' : 'none';
+        div.innerHTML = `<img src="${panel.image}" alt="Panel ${index + 1}"><p>${panel.text}</p>`;
+        container.appendChild(div);
+      });
       updateProgress();
     }
-  }
 
-  function updateProgress() {
-    document.getElementById('progress').textContent = `Page ${currentPanel + 1} of ${comicPanels.length}`;
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') navigate(1);
-    if (e.key === 'ArrowLeft') navigate(-1);
-  });
-
-  function toggleInventory() {
-    const inv = document.getElementById('inventoryWindow');
-    inv.style.display = inv.style.display === 'none' ? 'block' : 'none';
-  }
-
-  document.getElementById('inventoryButton').addEventListener('click', toggleInventory);
-
-  function addItem(item) {
-    if (!inventory.includes(item)) {
-      inventory.push(item);
-      localStorage.setItem("comicInventory", JSON.stringify(inventory));
-      updateInventoryDisplay();
+    function navigate(direction) {
+      const panels = document.querySelectorAll('.panel');
+      const newIndex = currentPanel + direction;
+      if (newIndex >= 0 && newIndex < panels.length) {
+        panels[currentPanel].style.display = 'none';
+        currentPanel = newIndex;
+        panels[currentPanel].style.display = 'block';
+        document.getElementById('prevButton').disabled = currentPanel === 0;
+        document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
+        updateProgress();
+      }
     }
-  }
 
-  function updateInventoryDisplay() {
-    const container = document.getElementById("inventoryItems");
-    if (inventory.length === 0) {
-      container.innerHTML = "<p>Inventory is empty.</p>";
-    } else {
-      container.innerHTML = "";
-      inventory.forEach(item => {
-        const itemDiv = document.createElement("div");
-        itemDiv.className = "item-box";
-
-        const itemImg = document.createElement("img");
-        const fileName = item.toLowerCase().replace(/ /g, "_") + ".png";
-        itemImg.src = `images/${fileName}`;
-        itemImg.alt = item;
-
-        const label = document.createElement("div");
-        label.className = "item-label";
-        label.textContent = item;
-
-        itemDiv.appendChild(itemImg);
-        itemDiv.appendChild(label);
-        container.appendChild(itemDiv);
-      });
+    function updateProgress() {
+      document.getElementById('progress').textContent = `Page ${currentPanel + 1} of ${comicPanels.length}`;
     }
-  }
 
-  document.addEventListener('DOMContentLoaded', loadComic);
-</script>
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') navigate(1);
+      if (e.key === 'ArrowLeft') navigate(-1);
+    });
+
+    document.addEventListener('DOMContentLoaded', loadComic);
+  </script>
 
 </body>
 </html>
+
 
