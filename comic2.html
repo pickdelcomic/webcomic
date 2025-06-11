@@ -3,10 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Comic 2 - Empty Pages</title>
-  
-  <!-- Link to XP.css for Windows XP Styling -->
   <link rel="stylesheet" href="https://unpkg.com/xp.css">
-
   <style>
     body {
       background-color: #0033cc;
@@ -33,7 +30,6 @@
       border: 2px solid #2e4f8f;
       margin: 10px 0;
       padding: 15px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       display: none;
       min-height: 400px;
     }
@@ -65,7 +61,6 @@
       border: 2px solid #2e4f8f;
       cursor: pointer;
       font-size: 16px;
-      transition: background-color 0.3s, color 0.3s;
     }
 
     .nav-button:hover {
@@ -98,8 +93,36 @@
       left: 10px;
       top: 50px;
       z-index: 99;
-      width: 200px;
+      width: 240px;
+      background: white;
+      border: 2px solid #2e4f8f;
       display: none;
+    }
+
+    #inventoryItems {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 10px;
+      background-color: white;
+      color: black;
+    }
+
+    .item-box {
+      margin: 10px;
+      text-align: center;
+    }
+
+    .item-box img {
+      width: 200px;
+      height: 200px;
+      display: block;
+      margin: 0 auto;
+      border: 1px solid #2e4f8f;
+    }
+
+    .item-label {
+      margin-top: 5px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -139,19 +162,7 @@
   </div>
 
   <script>
-    const comicPanels = [
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" },
-      { image: "", text: "" }
-    ];
-
+    const comicPanels = Array(10).fill({ image: "", text: "" });
     let currentPanel = 0;
     let inventory = JSON.parse(localStorage.getItem("comicInventory")) || [];
 
@@ -163,12 +174,8 @@
         div.style.display = index === 0 ? 'block' : 'none';
 
         let innerHTML = '';
-        if (panel.image) {
-          innerHTML += `<img src="${panel.image}" alt="Panel ${index + 1}">`;
-        }
-        if (panel.text) {
-          innerHTML += `<p>${panel.text}</p>`;
-        }
+        if (panel.image) innerHTML += `<img src="${panel.image}" alt="Panel ${index + 1}">`;
+        if (panel.text) innerHTML += `<p>${panel.text}</p>`;
 
         div.innerHTML = innerHTML;
         container.appendChild(div);
@@ -219,7 +226,24 @@
       if (inventory.length === 0) {
         container.innerHTML = "<p>Inventory is empty.</p>";
       } else {
-        container.innerHTML = "<ul>" + inventory.map(i => `<li>${i}</li>`).join("") + "</ul>";
+        container.innerHTML = "";
+        inventory.forEach(item => {
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "item-box";
+
+          const itemImg = document.createElement("img");
+          const fileName = item.toLowerCase().replace(/ /g, "_") + ".png";
+          itemImg.src = `images/${fileName}`;
+          itemImg.alt = item;
+
+          const label = document.createElement("div");
+          label.className = "item-label";
+          label.textContent = item;
+
+          itemDiv.appendChild(itemImg);
+          itemDiv.appendChild(label);
+          container.appendChild(itemDiv);
+        });
       }
     }
 
