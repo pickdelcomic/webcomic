@@ -1,130 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Comic 2 with Inventory</title>
-  <link rel="stylesheet" href="https://unpkg.com/xp.css" />
-  <style>
-    body {
-      background-color: #0033cc;
-      color: white;
-      margin: 0;
-      padding: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+<meta charset="UTF-8" />
+<title>Comic 2 with Toggle Inventory</title>
+<link rel="stylesheet" href="https://unpkg.com/xp.css" />
+<style>
+  body {
+    background-color: #0033cc;
+    color: white;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .comic-container {
-      width: 95%;
-      max-width: 800px;
-      margin-top: 20px;
-      background-color: #f0f0f0;
-      border: 2px solid #2e4f8f;
-      padding: 15px;
-      box-sizing: border-box;
-      color: #2e4f8f;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+  .comic-container {
+    width: 95%;
+    max-width: 800px;
+    margin-top: 20px;
+    background-color: #f0f0f0;
+    border: 2px solid #2e4f8f;
+    padding: 15px;
+    box-sizing: border-box;
+    color: #2e4f8f;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
 
-    .panel img {
-      width: 100%;
-      height: auto;
-      border: 2px solid #2e4f8f;
-      margin-bottom: 10px;
-    }
+  .panel img {
+    width: 100%;
+    height: auto;
+    border: 2px solid #2e4f8f;
+    margin-bottom: 10px;
+  }
 
-    .panel p {
-      font-size: 14px;
-      text-align: left;
-      margin: 0 0 10px 0;
-    }
+  .panel p {
+    font-size: 14px;
+    text-align: left;
+    margin: 0 0 10px 0;
+  }
 
-    .navigation {
-      margin-top: 10px;
-      text-align: center;
-    }
+  .navigation {
+    margin-top: 10px;
+    text-align: center;
+  }
 
-    .nav-button {
-      background-color: transparent;
-      color: #2e4f8f;
-      padding: 10px 20px;
-      margin: 0 10px;
-      text-decoration: none;
-      border: 2px solid #2e4f8f;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s, color 0.3s;
-    }
+  .nav-button {
+    background-color: transparent;
+    color: #2e4f8f;
+    padding: 10px 20px;
+    margin: 0 10px;
+    text-decoration: none;
+    border: 2px solid #2e4f8f;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s;
+  }
 
-    .nav-button:hover {
-      background-color: #2e4f8f;
-      color: white;
-    }
+  .nav-button:hover {
+    background-color: #2e4f8f;
+    color: white;
+  }
 
-    .nav-button:disabled {
-      color: #888;
-      border-color: #888;
-      cursor: not-allowed;
-    }
+  .nav-button:disabled {
+    color: #888;
+    border-color: #888;
+    cursor: not-allowed;
+  }
 
-    #progress {
-      text-align: center;
-      margin-top: 10px;
-      color: white;
-    }
+  #progress {
+    text-align: center;
+    margin-top: 10px;
+    color: white;
+  }
 
-    /* Inventory styles */
-    #inventory {
-      margin-top: 20px;
-      width: 95%;
-      max-width: 800px;
-      background-color: #f0f0f0;
-      border: 2px solid #2e4f8f;
-      padding: 10px;
-      box-sizing: border-box;
-      color: #2e4f8f;
-    }
+  /* Inventory toggle button in top-left corner of comic container */
+  #inventory-toggle {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 50px;
+    height: 50px;
+    background: url('https://cdn-icons-png.flaticon.com/512/1077/1077035.png') no-repeat center center;
+    background-size: contain;
+    border: 2px solid #2e4f8f;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 10;
+  }
+  #inventory-toggle:hover {
+    filter: brightness(0.85);
+  }
 
-    #inventory h3 {
-      margin-top: 0;
-    }
+  /* Inventory panel */
+  #inventory-panel {
+    position: fixed;
+    top: 70px;
+    left: 10px;
+    background-color: #f0f0f0;
+    border: 2px solid #2e4f8f;
+    padding: 10px;
+    width: 280px;
+    max-height: 400px;
+    overflow-y: auto;
+    color: #2e4f8f;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    display: none;
+    z-index: 20;
+    border-radius: 6px;
+  }
 
-    #inventory-items {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+  #inventory-panel h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: center;
+  }
 
-    .inventory-item {
-      border: 2px solid #2e4f8f;
-      padding: 5px;
-      background: white;
-      color: black;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      user-select: none;
-      font-weight: bold;
-      border-radius: 6px;
-      transition: background-color 0.3s;
-    }
+  #inventory-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
 
-    .inventory-item:hover {
-      background-color: #2e4f8f;
-      color: white;
-    }
+  .inventory-item {
+    width: 50px;
+    height: 50px;
+    border: 2px solid #2e4f8f;
+    border-radius: 6px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    font-weight: bold;
+    color: #2e4f8f;
+    transition: background-color 0.3s, color 0.3s;
+    position: relative;
+  }
 
-  </style>
+  .inventory-item:hover {
+    background-color: #2e4f8f;
+    color: white;
+  }
+
+  /* Overlay for clicking outside inventory */
+  #overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: transparent;
+    display: none;
+    z-index: 15;
+  }
+</style>
 </head>
 <body>
 
   <div class="comic-container" id="comicContainer">
-    <!-- Panels injected here -->
+    <div id="inventory-toggle" title="Open Inventory"></div>
   </div>
 
   <p id="progress"></p>
@@ -136,39 +172,41 @@
     <button class="nav-button" onclick="window.location.href='comic2.html'">Comic 2</button>
   </div>
 
-  <!-- Inventory Section -->
-  <div id="inventory">
+  <!-- Inventory panel -->
+  <div id="inventory-panel" aria-hidden="true">
     <h3>Inventory</h3>
-    <div id="inventory-items">
-      <!-- Items will appear here -->
-    </div>
+    <div id="inventory-items"></div>
   </div>
+
+  <!-- Overlay to detect clicks outside inventory -->
+  <div id="overlay"></div>
 
   <script>
     const comicPanels = [
       { image: "pages/png1.png", text: "Welcome to Comic 2!" },
       { image: "pages/Png2.png", text: "Look at this cool panel." },
       { image: "pages/Gif.gif", text: "An animated panel with GIF." },
-      { image: "pages/Png4.gif", text: "Do you see the inventory? You can click items!" },
-      // Add more panels as needed
+      { image: "pages/Png4.gif", text: "Use the inventory button top-left to view items." },
+      // Add more panels here
+    ];
+
+    const inventoryItems = [
+      { id: "key", label: "Key", details: "A rusty old key. Might open something." },
+      { id: "map", label: "Map", details: "A worn map showing the nearby area." },
+      { id: "potion", label: "Potion", details: "A mysterious red potion. Heals 50 HP." },
+      { id: "scroll", label: "Scroll", details: "Ancient scroll with magical writings." },
+      { id: "coin", label: "Coin", details: "Shiny gold coin from a distant land." }
     ];
 
     let currentPanel = 0;
 
-    // Inventory example items - just simple text or could be images
-    const inventoryItems = [
-      { id: "item1", label: "Key" },
-      { id: "item2", label: "Map" },
-      { id: "item3", label: "Potion" },
-    ];
-
     function loadComic() {
       const container = document.getElementById('comicContainer');
-      container.innerHTML = "";
+      container.querySelectorAll('.panel').forEach(p => p.remove());
       comicPanels.forEach((panel, index) => {
         const div = document.createElement('div');
         div.className = 'panel';
-        div.style.display = index === 0 ? 'block' : 'none';
+        div.style.display = index === currentPanel ? 'block' : 'none';
         div.innerHTML = `<img src="${panel.image}" alt="Panel ${index + 1}"><p>${panel.text}</p>`;
         container.appendChild(div);
       });
@@ -192,20 +230,63 @@
       document.getElementById('progress').textContent = `Page ${currentPanel + 1} of ${comicPanels.length}`;
     }
 
+    // Inventory related
+    const inventoryToggle = document.getElementById('inventory-toggle');
+    const inventoryPanel = document.getElementById('inventory-panel');
+    const inventoryItemsDiv = document.getElementById('inventory-items');
+    const overlay = document.getElementById('overlay');
+
     function loadInventory() {
-      const invContainer = document.getElementById('inventory-items');
-      invContainer.innerHTML = "";
+      inventoryItemsDiv.innerHTML = "";
       inventoryItems.forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'inventory-item';
         itemDiv.textContent = item.label;
         itemDiv.title = item.label;
-        itemDiv.onclick = () => alert(`You clicked on ${item.label}!`);
-        invContainer.appendChild(itemDiv);
+        itemDiv.onclick = (e) => {
+          e.stopPropagation();
+          alert(`${item.label}\n\n${item.details}`);
+        };
+        inventoryItemsDiv.appendChild(itemDiv);
       });
     }
 
+    function toggleInventory(show) {
+      if (typeof show === 'boolean') {
+        inventoryPanel.style.display = show ? 'block' : 'none';
+        overlay.style.display = show ? 'block' : 'none';
+        inventoryPanel.setAttribute('aria-hidden', show ? 'false' : 'true');
+      } else {
+        const isVisible = inventoryPanel.style.display === 'block';
+        toggleInventory(!isVisible);
+      }
+    }
+
+    // Clicking the toggle button
+    inventoryToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleInventory();
+    });
+
+    // Clicking outside inventory closes it
+    overlay.addEventListener('click', () => {
+      toggleInventory(false);
+    });
+
+    // Also close inventory if user clicks anywhere outside inventory-panel or toggle button
+    document.addEventListener('click', (e) => {
+      if (
+        inventoryPanel.style.display === 'block' &&
+        !inventoryPanel.contains(e.target) &&
+        e.target !== inventoryToggle
+      ) {
+        toggleInventory(false);
+      }
+    });
+
+    // Keyboard navigation for comic
     document.addEventListener('keydown', (e) => {
+      if (inventoryPanel.style.display === 'block') return; // ignore nav when inventory open
       if (e.key === 'ArrowRight') navigate(1);
       if (e.key === 'ArrowLeft') navigate(-1);
     });
@@ -213,8 +294,10 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadComic();
       loadInventory();
+      document.getElementById('prevButton').disabled = true;
     });
   </script>
 
 </body>
 </html>
+
