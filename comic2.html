@@ -35,7 +35,7 @@
       padding: 15px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       display: none;
-      min-height: 400px; /* so empty panels have some height */
+      min-height: 400px;
     }
 
     .panel img {
@@ -84,10 +84,43 @@
       margin-top: 10px;
       color: white;
     }
+
+    #inventoryButton {
+      position: fixed;
+      left: 10px;
+      top: 10px;
+      z-index: 100;
+      cursor: pointer;
+    }
+
+    #inventoryWindow {
+      position: fixed;
+      left: 10px;
+      top: 50px;
+      z-index: 99;
+      width: 200px;
+      display: none;
+    }
   </style>
 </head>
 
 <body>
+
+  <!-- Inventory Button -->
+  <img src="https://i.imgur.com/mtbS8Wk.png" id="inventoryButton" alt="Inventory" width="32" height="32">
+
+  <!-- Inventory Window -->
+  <div id="inventoryWindow" class="window">
+    <div class="title-bar">
+      <div class="title-bar-text">Inventory</div>
+      <div class="title-bar-controls">
+        <button aria-label="Close" onclick="toggleInventory()"></button>
+      </div>
+    </div>
+    <div class="window-body" id="inventoryItems">
+      <p>Inventory is empty.</p>
+    </div>
+  </div>
 
   <!-- Comic Panels -->
   <div class="comic-container" id="comicContainer">
@@ -106,7 +139,6 @@
   </div>
 
   <script>
-    // Empty panels for Comic 2 — 10 blank pages for example
     const comicPanels = [
       { image: "", text: "" },
       { image: "", text: "" },
@@ -121,6 +153,7 @@
     ];
 
     let currentPanel = 0;
+    let inventory = JSON.parse(localStorage.getItem("comicInventory")) || [];
 
     function loadComic() {
       const container = document.getElementById('comicContainer');
@@ -129,7 +162,6 @@
         div.className = 'panel';
         div.style.display = index === 0 ? 'block' : 'none';
 
-        // If there is an image, show it, else just leave empty
         let innerHTML = '';
         if (panel.image) {
           innerHTML += `<img src="${panel.image}" alt="Panel ${index + 1}">`;
@@ -142,6 +174,7 @@
         container.appendChild(div);
       });
       updateProgress();
+      updateInventoryDisplay();
     }
 
     function navigate(direction) {
@@ -166,11 +199,34 @@
       if (e.key === 'ArrowLeft') navigate(-1);
     });
 
+    function toggleInventory() {
+      const inv = document.getElementById('inventoryWindow');
+      inv.style.display = inv.style.display === 'none' ? 'block' : 'none';
+    }
+
+    document.getElementById('inventoryButton').addEventListener('click', toggleInventory);
+
+    function addItem(item) {
+      if (!inventory.includes(item)) {
+        inventory.push(item);
+        localStorage.setItem("comicInventory", JSON.stringify(inventory));
+        updateInventoryDisplay();
+      }
+    }
+
+    function updateInventoryDisplay() {
+      const container = document.getElementById("inventoryItems");
+      if (inventory.length === 0) {
+        container.innerHTML = "<p>Inventory is empty.</p>";
+      } else {
+        container.innerHTML = "<ul>" + inventory.map(i => `<li>${i}</li>`).join("") + "</ul>";
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', loadComic);
   </script>
 
 </body>
 </html>
-
 </body>
 </html>
