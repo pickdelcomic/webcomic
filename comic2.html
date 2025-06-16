@@ -231,6 +231,20 @@
   <button class="nav-button" id="nextButton" onclick="navigate(1)">Next</button>
   <button class="nav-button" onclick="window.location.href='index.html'">Home</button>
   <button class="nav-button" onclick="window.location.href='comic2.html'">Comic 2</button>
+
+    // 🎁 Give item at panel 2
+    if (currentPanel === 1 && !ownedItems.includes("mystery-token")) {
+      ownedItems.push("mystery-token");
+      loadInventory();
+    }
+
+    // 🗑️ Remove item at panel 4
+    if (currentPanel === 3 && ownedItems.includes("mystery-token")) {
+      ownedItems = ownedItems.filter(id => id !== "mystery-token");
+      loadInventory();
+    }
+  }
+}
 </div>
 
 <script>
@@ -245,7 +259,8 @@
   const inventoryItems = [
     { id: "fish",name: "fried fish", image: "stuff/yum.jpg", desc: "pot : looks and smells nice also heals 30.", rarity: "common" },
     { id: "dr-evil-rock", name: "ROCK <dr evil>", image: "stuff/rock.png", desc: "pom : i kept it incase i get a sock it makes a pretty badbum wepon.", rarity: "uncommon" },
-     { id: "common-gun", name: "common gun", image: "stuff/gun.png", desc: "pom : i love this guy he's like a brother i never had pom : HEYY!?!?!?.", rarity: "uncommon" },
+     { id: "common-gun", name: "common gun", image: "stuff/gun.png", desc: "pom : i love this guy he's like a brother i never had pot : HEYY!?!?!?.", rarity: "uncommon" },
+     { id: "hand", name: "<TOTALLY>fake hand", image: "stuff/hand.png", desc: "pot : this is dads.", rarity: "uncommon" },
   ];
 
   let currentPanel = 0;
