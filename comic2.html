@@ -268,17 +268,28 @@
   }
 
   function navigate(dir) {
-    const panels = document.querySelectorAll('.panel');
-    if (currentPanel + dir >= 0 && currentPanel + dir < panels.length) {
-      panels[currentPanel].style.display = 'none';
-      currentPanel += dir;
-      panels[currentPanel].style.display = 'block';
-      document.getElementById('prevButton').disabled = currentPanel === 0;
-      document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
-      updateProgress();
+  const panels = document.querySelectorAll('.panel');
+  if (currentPanel + dir >= 0 && currentPanel + dir < panels.length) {
+    panels[currentPanel].style.display = 'none';
+    currentPanel += dir;
+    panels[currentPanel].style.display = 'block';
+    document.getElementById('prevButton').disabled = currentPanel === 0;
+    document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
+    updateProgress();
+
+    // 🎁 Give item at panel 2
+    if (currentPanel === 1 && !ownedItems.includes("hand")) {
+      ownedItems.push("hand");
+      loadInventory();
+    }
+
+    // 🗑️ Remove item at panel 4
+    if (currentPanel === 3 && ownedItems.includes("hand")) {
+      ownedItems = ownedItems.filter(id => id !== "hand");
+      loadInventory();
     }
   }
-
+}
   function updateProgress() {
     document.getElementById('progress').textContent = `Page ${currentPanel + 1} of ${comicPanels.length}`;
   }
