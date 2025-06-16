@@ -2,20 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Comic 2 with XP Inventory</title>
+  <title>Comic 2 with XP Inventory & Rarity Colors</title>
   <link rel="stylesheet" href="https://unpkg.com/xp.css" />
   <style>
-     <style>
-   body {
-  background-image: url("thumbnails/background.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  color: white;
-  font-family: 'Press Start 2P', Tahoma, sans-serif;
-  text-align: center;
-  margin: 0;
-}
+    body {
+      background-image: url("thumbnails/background.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: white;
+      font-family: 'Press Start 2P', Tahoma, sans-serif;
+      text-align: center;
+      margin: 0;
+    }
 
     .comic-container {
       width: 95%;
@@ -108,17 +107,77 @@
       width: 60px;
       text-align: center;
       cursor: pointer;
+      border: 2px solid gray;
+      border-radius: 6px;
+      padding: 2px;
+      transition: transform 0.2s ease;
+    }
+
+    .inventory-item:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
     }
 
     .inventory-item img {
       width: 50px;
       height: 50px;
-      border: 1px solid gray;
+      border-radius: 4px;
+      display: block;
+      margin: 0 auto;
     }
 
     .inventory-item p {
       margin: 4px 0 0;
       font-size: 12px;
+      color: black;
+      font-weight: bold;
+    }
+
+    /* Rarity border colors */
+    .rarity-common {
+      border-color: gray !important;
+    }
+    .rarity-uncommon {
+      border-color: green !important;
+    }
+    .rarity-rare {
+      border-color: blue !important;
+    }
+    .rarity-epic {
+      border-color: purple !important;
+    }
+    .rarity-legendary {
+      border-color: orange !important;
+    }
+
+    /* Item Detail Popup */
+    #item-detail {
+      display: none;
+      position: fixed;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      z-index: 999;
+    }
+    #item-detail .title-bar-text {
+      font-weight: bold;
+    }
+    #item-detail .window-body {
+      text-align: center;
+      background-color: white;
+      color: black;
+    }
+    #item-detail img {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 10px;
+      border: 1px solid gray;
+      border-radius: 8px;
+    }
+    #item-detail p {
+      font-size: 12px;
+      margin: 0 10px 10px 10px;
     }
   </style>
 </head>
@@ -140,6 +199,20 @@
   </div>
 </div>
 
+<!-- Item Detail Popup -->
+<div class="window" id="item-detail">
+  <div class="title-bar">
+    <div class="title-bar-text" id="detail-title">Item Name</div>
+    <div class="title-bar-controls">
+      <button aria-label="Close" onclick="closeDetail()"></button>
+    </div>
+  </div>
+  <div class="window-body">
+    <img id="detail-image" src="" alt=""/>
+    <p id="detail-desc"></p>
+  </div>
+</div>
+
 <!-- Comic Container -->
 <div class="comic-container" id="comicContainer">
   <!-- Comic panels get added here -->
@@ -157,17 +230,19 @@
 
 <script>
   const comicPanels = [
-    { image: "pages/.png", text: "Comic 2 begins!" },
-    { image: "pages/.png", text: "What's that up in the corner?" },
-    { image: "pages/.gif", text: "Inventory button? That’s new!" },
-    { image: "pages/.gif", text: "Try clicking it to see your stuff!" }
+    { image: "pages/page1.png", text: "Comic 2 begins!" },
+    { image: "pages/page2.png", text: "What's that up in the corner?" },
+    { image: "pages/page3.gif", text: "Inventory button? That’s new!" },
+    { image: "pages/page4.gif", text: "Try clicking it to see your stuff!" }
   ];
 
+  // Added rarity to each item for color coding
   const inventoryItems = [
-    { name: "Key", image: "https://cdn-icons-png.flaticon.com/512/61/61457.png", desc: "An old rusty key." },
-    { name: "Map", image: "https://cdn-icons-png.flaticon.com/512/854/854894.png", desc: "A faded paper map." },
-    { name: "Potion", image: "https://cdn-icons-png.flaticon.com/512/590/590685.png", desc: "Restores 50 HP." },
-    { name: "Coin", image: "https://cdn-icons-png.flaticon.com/512/481/481874.png", desc: "Golden currency." }
+    { name: "Key", image: "images/key.png", desc: "An old rusty key.", rarity: "common" },
+    { name: "Map", image: "images/map.png", desc: "A faded paper map.", rarity: "uncommon" },
+    { name: "Potion", image: "images/potion.png", desc: "Restores 50 HP.", rarity: "rare" },
+    { name: "Coin", image: "images/coin.png", desc: "Golden currency.", rarity: "epic" },
+    { name: "Crown", image: "images/crown.png", desc: "Royal crown of legend.", rarity: "legendary" }
   ];
 
   let currentPanel = 0;
@@ -201,18 +276,34 @@
     document.getElementById('progress').textContent = `Page ${currentPanel + 1} of ${comicPanels.length}`;
   }
 
+  // Loads inventory with rarity-based border colors
   function loadInventory() {
     const itemsDiv = document.getElementById('inventory-items');
     itemsDiv.innerHTML = '';
     inventoryItems.forEach(item => {
       const div = document.createElement('div');
-      div.className = 'inventory-item';
+      div.className = 'inventory-item rarity-' + item.rarity;
       div.innerHTML = `<img src="${item.image}" alt="${item.name}"><p>${item.name}</p>`;
-      div.onclick = () => alert(`${item.name}\n\n${item.desc}`);
+      div.onclick = () => showDetail(item);
       itemsDiv.appendChild(div);
     });
   }
 
+  // Show item detail popup
+  function showDetail(item) {
+    document.getElementById('detail-title').textContent = item.name;
+    document.getElementById('detail-image').src = item.image;
+    document.getElementById('detail-image').alt = item.name;
+    document.getElementById('detail-desc').textContent = item.desc;
+    document.getElementById('item-detail').style.display = 'block';
+  }
+
+  // Close item detail popup
+  function closeDetail() {
+    document.getElementById('item-detail').style.display = 'none';
+  }
+
+  // Toggle inventory window visibility
   function toggleInventory(show = null) {
     const windowDiv = document.getElementById('inventory-window');
     const isVisible = windowDiv.style.display === 'block';
@@ -222,6 +313,7 @@
 
   document.getElementById('inventory-toggle').onclick = () => toggleInventory();
 
+  // Load comic and inventory on page load
   document.addEventListener('DOMContentLoaded', () => {
     loadComic();
     loadInventory();
