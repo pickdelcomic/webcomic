@@ -31,7 +31,7 @@
       max-width: 800px;
       background-color: #f0f0f0;
       border: 2px solid #2e4f8f;
-      margin: 10px 0;
+      margin: 10px auto;
       padding: 15px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       display: none;
@@ -71,21 +71,19 @@
       color: white;
     }
 
-    /* Top-left fixed XP-style inventory button */
     #inventory-toggle {
       position: fixed;
       top: 10px;
       left: 10px;
       width: 40px;
       height: 40px;
-      background: background: url("images/inventory.png") no-repeat center center;
+      background: url("images/inventory.png") no-repeat center center;
       background-size: contain;
       border: none;
       cursor: pointer;
       z-index: 100;
     }
 
-    /* XP style inventory window */
     #inventory-window {
       position: fixed;
       top: 60px;
@@ -138,24 +136,12 @@
       font-weight: bold;
     }
 
-    /* Rarity border colors */
-    .rarity-common {
-      border-color: gray !important;
-    }
-    .rarity-uncommon {
-      border-color: green !important;
-    }
-    .rarity-rare {
-      border-color: blue !important;
-    }
-    .rarity-epic {
-      border-color: purple !important;
-    }
-    .rarity-legendary {
-      border-color: orange !important;
-    }
+    .rarity-common { border-color: gray !important; }
+    .rarity-uncommon { border-color: green !important; }
+    .rarity-rare { border-color: blue !important; }
+    .rarity-epic { border-color: purple !important; }
+    .rarity-legendary { border-color: orange !important; }
 
-    /* Item Detail Popup */
     #item-detail {
       display: none;
       position: fixed;
@@ -165,9 +151,7 @@
       width: 300px;
       z-index: 999;
     }
-    #item-detail .title-bar-text {
-      font-weight: bold;
-    }
+    #item-detail .title-bar-text { font-weight: bold; }
     #item-detail .window-body {
       text-align: center;
       background-color: white;
@@ -219,10 +203,7 @@
 </div>
 
 <!-- Comic Container -->
-<div class="comic-container" id="comicContainer">
-  <!-- Comic panels get added here -->
-</div>
-
+<div class="comic-container" id="comicContainer"></div>
 <p id="progress"></p>
 
 <!-- Navigation Buttons -->
@@ -241,13 +222,14 @@
     { image: "pages/page4.gif", text: "Try clicking it to see your stuff!" }
   ];
 
-  // Added rarity to each item for color coding
   const inventoryItems = [
-    { name: "fried fish", image: "stuff/yum.jpg", desc: "pot : looks and smells nice also heals 30.", rarity: "common" },
-    { name: "ROCK <dr evil>", image: "stuff/rock.png", desc: "pom : i kept it incase i get a sock it makes a pretty badbum wepon.", rarity: "uncommon" },
-     { name: "common gun", image: "stuff/gun.png", desc: "pom : i love this guy he's like a brother i never had pom : HEYY!?!?!?.", rarity: "uncommon" },
+    { id: "fried-fish", name: "fried fish", image: "stuff/yum.jpg", desc: "pot : looks and smells nice also heals 30.", rarity: "common" },
+    { id: "rock", name: "ROCK <dr evil>", image: "stuff/rock.png", desc: "pom : i kept it incase i get a sock it makes a pretty badbum wepon.", rarity: "uncommon" },
+    { id: "common-gun", name: "common gun", image: "stuff/gun.png", desc: "pom : i love this guy he's like a brother i never had pom : HEYY!?!?!?.", rarity: "uncommon" },
+    { id: "mystery-token", name: "Mystery Token", image: "stuff/token.png", desc: "A strange glowing token.", rarity: "rare" }
   ];
 
+  let ownedItems = [];
   let currentPanel = 0;
 
   function loadComic() {
@@ -272,6 +254,15 @@
       document.getElementById('prevButton').disabled = currentPanel === 0;
       document.getElementById('nextButton').disabled = currentPanel === panels.length - 1;
       updateProgress();
+
+      if (currentPanel === 1 && !ownedItems.includes("mystery-token")) {
+        ownedItems.push("mystery-token");
+        loadInventory();
+      }
+      if (currentPanel === 3 && ownedItems.includes("mystery-token")) {
+        ownedItems = ownedItems.filter(id => id !== "mystery-token");
+        loadInventory();
+      }
     }
   }
 
@@ -279,20 +270,20 @@
     document.getElementById('progress').textContent = `Page ${currentPanel + 1} of ${comicPanels.length}`;
   }
 
-  // Loads inventory with rarity-based border colors
   function loadInventory() {
     const itemsDiv = document.getElementById('inventory-items');
     itemsDiv.innerHTML = '';
     inventoryItems.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'inventory-item rarity-' + item.rarity;
-      div.innerHTML = `<img src="${item.image}" alt="${item.name}"><p>${item.name}</p>`;
-      div.onclick = () => showDetail(item);
-      itemsDiv.appendChild(div);
+      if (ownedItems.includes(item.id)) {
+        const div = document.createElement('div');
+        div.className = 'inventory-item rarity-' + item.rarity;
+        div.innerHTML = `<img src="${item.image}" alt="${item.name}"><p>${item.name}</p>`;
+        div.onclick = () => showDetail(item);
+        itemsDiv.appendChild(div);
+      }
     });
   }
 
-  // Show item detail popup
   function showDetail(item) {
     document.getElementById('detail-title').textContent = item.name;
     document.getElementById('detail-image').src = item.image;
@@ -301,12 +292,10 @@
     document.getElementById('item-detail').style.display = 'block';
   }
 
-  // Close item detail popup
   function closeDetail() {
     document.getElementById('item-detail').style.display = 'none';
   }
 
-  // Toggle inventory window visibility
   function toggleInventory(show = null) {
     const windowDiv = document.getElementById('inventory-window');
     const isVisible = windowDiv.style.display === 'block';
@@ -316,7 +305,6 @@
 
   document.getElementById('inventory-toggle').onclick = () => toggleInventory();
 
-  // Load comic and inventory on page load
   document.addEventListener('DOMContentLoaded', () => {
     loadComic();
     loadInventory();
@@ -325,5 +313,3 @@
 
 </body>
 </html>
-
-
