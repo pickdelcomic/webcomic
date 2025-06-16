@@ -232,17 +232,6 @@
   <button class="nav-button" onclick="window.location.href='index.html'">Home</button>
   <button class="nav-button" onclick="window.location.href='comic2.html'">Comic 2</button>
 
-    // 🎁 Give item at panel 2
-    if (currentPanel === 1 && !ownedItems.includes("hand")) {
-      ownedItems.push("hand");
-      loadInventory();
-    }
-
-    // 🗑️ Remove item at panel 4
-    if (currentPanel === 3 && ownedItems.includes("hand")) {
-      ownedItems = ownedItems.filter(id => id !== "hand");
-      loadInventory();
-    }
   }
 }
 </div>
