@@ -17,20 +17,31 @@
     }
 
     .comic-container {
-  margin: 60px auto; /* center the container horizontally */
-  text-align: center; /* center contents inside container */
-}
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+    }
 
-.panel {
-  max-width: 600px;    /* optional max width for panels */
-  margin: 0 auto 30px; /* center each panel block */
-  text-align: center;  /* center text and images inside each panel */
-}
+    .panel {
+      width: 95%;
+      max-width: 800px;
+      background-color: #f0f0f0;
+      border: 2px solid #2e4f8f;
+      margin: 10px 0;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
 
-    .panel p {
-      font-size: 14px;
-      text-align: left;
-      margin: 0 0 10px 0;
+    .panel img {
+      width: 100%;
+      height: auto;
+      border: 2px solid #2e4f8f;
+      margin-bottom: 10px;
     }
 
     .navigation {
